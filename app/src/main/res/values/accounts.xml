@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Tracker -->
+    <string name="google_analytic_key" translatable="false">UA-28481756-2</string>
+    <string translatable="false" name="hockeyapp_key">675926019f9549568d7fc2c02e96de1f</string>
+    <string translatable="false" name="hockeyapp_pkg">com.landenlabs</string>
+
+</resources>
