@@ -1,6 +1,6 @@
 package com.landenlabs.all_devtool;
 
-/**
+/*
  * Copyright (c) 2016 Dennis Lang (LanDen Labs) landenlabs@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -246,9 +246,9 @@ public class TabPagerAdapter extends FragmentPagerAdapter implements ActionBar.T
             }
         }
 
-        /**
+        /*
          * On swiping the viewpager sets respective tab selected.
-         * */
+         */
         if (m_actionBar != null) {
             m_viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 

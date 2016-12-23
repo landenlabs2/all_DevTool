@@ -84,7 +84,7 @@ public class AppCrash extends CrashManagerListener {
 
     /**
      * Please all Log 'errors' in description.
-     * @return
+     * @return Crash description
      */
     public String getDescription() {
         String description = "";

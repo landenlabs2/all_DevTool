@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Build;
 import android.system.StructStat;
 import android.util.Log;
-import android.widget.Button;
 
 import java.io.File;
 import java.io.IOException;
@@ -151,7 +150,7 @@ public class FileUtil {
         }
     }
 
-    public static class DirInfo extends Button {
+    public static class DirInfo extends android.support.v7.widget.AppCompatButton {
         File m_dir;
         public DirInfo(Context context, File dir) {
             super(context);

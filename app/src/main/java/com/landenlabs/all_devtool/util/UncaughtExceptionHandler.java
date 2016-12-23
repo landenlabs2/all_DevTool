@@ -5,7 +5,7 @@ import android.util.Log;
 import java.text.SimpleDateFormat;
 
 /**
- * Created by ldennis on 5/1/16.
+ * Created by Dennis Lang on 5/1/16.
  */
 public class UncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
 

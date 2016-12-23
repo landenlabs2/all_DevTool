@@ -1,6 +1,6 @@
 package com.landenlabs.all_devtool;
 
-/**
+/*
  * Copyright (c) 2016 Dennis Lang (LanDen Labs) landenlabs@gmail.com
  * <p/>
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -86,7 +86,7 @@ public class ThemeFragment extends DevFragment implements OnItemSelectedListener
         if (null != bitmap && !bitmap.isRecycled())
             bitmapList.add(bitmap);
         else
-            Toast.makeText(getActivity(), "Failed to grab screen\nExit App & retry", Toast.LENGTH_LONG);
+            Toast.makeText(getActivity(), "Failed to grab screen\nExit App & retry", Toast.LENGTH_LONG).show();
         return bitmapList;
     }
 

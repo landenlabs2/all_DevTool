@@ -1,6 +1,6 @@
 package com.landenlabs.all_devtool;
 
-/**
+/*
  * Copyright (c) 2016 Dennis Lang (LanDen Labs) landenlabs@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -33,7 +33,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.util.SparseArray;
+import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -99,7 +99,7 @@ public class ClockFragment extends DevFragment implements View.OnClickListener  
     private LinearLayout m_timeBotList;
 
     // Timezone Daylight savings
-    enum DaylightFilter { NoDS, HasDS, InDS};
+    enum DaylightFilter { NoDS, HasDS, InDS}
     DaylightFilter m_daylightFilter = DaylightFilter.HasDS;
 
     // Additional times
@@ -397,7 +397,8 @@ public class ClockFragment extends DevFragment implements View.OnClickListener  
                         tzStr2.append("TimeZone (In Daylight savings):\n");
                         break;
                 }
-                SparseArray<Integer> zones = new SparseArray<Integer>();
+
+                SparseIntArray zones = new SparseIntArray();
                 for (int tzIdx = 0; tzIdx < ids.length; tzIdx++) {
                     TimeZone tz = TimeZone.getTimeZone(ids[tzIdx]);
                     boolean addTz = false;

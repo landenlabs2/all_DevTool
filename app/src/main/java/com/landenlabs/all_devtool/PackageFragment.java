@@ -1,6 +1,6 @@
 package com.landenlabs.all_devtool;
 
-/**
+/*
  * Copyright (c) 2016 Dennis Lang (LanDen Labs) landenlabs@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -1267,7 +1267,7 @@ public class PackageFragment extends DevFragment
             int flags2 = PackageManager.GET_PERMISSIONS
                      | PackageManager.GET_ACTIVITIES
                      | PackageManager.GET_SERVICES;
-            ;
+
 
             int flags3 = PackageManager.GET_PERMISSIONS;
             int flags4 = 0;
@@ -1453,7 +1453,8 @@ public class PackageFragment extends DevFragment
                         cacheDirectory = mContext.getCacheDir();
                     } else {
                         // cacheDirectory = new File(mContext.getPackageResourcePath());
-                        cacheDirectory = new File("/data/data/" + mContext.getPackageName() + "/cache");
+                        String dataPath = mContext.getFilesDir().getPath(); // "/data/data/"
+                        cacheDirectory = new File(dataPath, mContext.getPackageName() + "/cache");
                     }
 
                     if (cacheDirectory != null)
@@ -1530,15 +1531,17 @@ public class PackageFragment extends DevFragment
                         addList(pkgList, "Version", packInfo.versionName);
                         addList(pkgList, "TargetSDK", String.valueOf(packInfo.applicationInfo.targetSdkVersion));
                         String installTyp = "auto";
-                        switch (packInfo.installLocation) {
-                            case PackageInfo.INSTALL_LOCATION_AUTO:
-                                break;
-                            case PackageInfo.INSTALL_LOCATION_INTERNAL_ONLY:
-                                installTyp = "internal";
-                                break;
-                            case PackageInfo.INSTALL_LOCATION_PREFER_EXTERNAL:
-                                installTyp = "external";
-                                break;
+                        if (Build.VERSION.SDK_INT >= 21) {
+                            switch (packInfo.installLocation) {
+                                case PackageInfo.INSTALL_LOCATION_AUTO:
+                                    break;
+                                case PackageInfo.INSTALL_LOCATION_INTERNAL_ONLY:
+                                    installTyp = "internal";
+                                    break;
+                                case PackageInfo.INSTALL_LOCATION_PREFER_EXTERNAL:
+                                    installTyp = "external";
+                                    break;
+                            }
                         }
                         addList(pkgList, "Install", installTyp);
 

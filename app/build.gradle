@@ -9,7 +9,7 @@ android {
         config {
             keyAlias 'all_devtool'
             keyPassword 'Salem2nh-k'
-            storeFile file('/Users/ldennis/Dropbox/android/keystores/all_devtool.jks')
+            storeFile file('/Users/Dennis Lang/Dropbox/android/keystores/all_devtool.jks')
             storePassword 'Salem2nh-d'
         }
     }
@@ -43,7 +43,6 @@ android {
             minifyEnabled false
             jniDebuggable true
             debuggable true
-
         }
     }
 
@@ -79,6 +78,7 @@ dependencies {
     compile "com.google.android.gms:play-services-analytics:${playServicesVersion}"
     compile "com.google.android.gms:play-services-location:${playServicesVersion}"
     compile "com.google.android.gms:play-services-drive:${playServicesVersion}"
+
     compile 'net.hockeyapp.android:HockeySDK:4.1.1'
 
     // 3rdparty libraries

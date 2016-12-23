@@ -101,8 +101,7 @@ public class ShortcutUtil {
         boolean shortCutWasAlreadyAdded = sharedPreferences.getBoolean(shortcutName, false);
         if (shortCutWasAlreadyAdded)
             return;
-        sharedPreferences.edit().putBoolean(shortcutName, true);
-        sharedPreferences.edit().apply();
+        sharedPreferences.edit().putBoolean(shortcutName, true).apply();
 
         Intent shortcutIntent;
         shortcutIntent = new Intent(fragActivity, cls);

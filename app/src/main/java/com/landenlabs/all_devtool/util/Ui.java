@@ -30,6 +30,7 @@ public class Ui {
     }
 
     public static <E extends View> E viewById(FragmentActivity fact, int id) {
+        //noinspection unchecked
         return (E) fact.findViewById(id);
     }
 

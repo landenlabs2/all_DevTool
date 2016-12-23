@@ -1,6 +1,6 @@
 package com.landenlabs.all_devtool;
 
-/**
+/*
  * Copyright (c) 2016 Dennis Lang (LanDen Labs) landenlabs@gmail.com
  * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and

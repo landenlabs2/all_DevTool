@@ -1,6 +1,6 @@
 package com.landenlabs.all_devtool;
 
-/**
+/*
  * Copyright (c) 2016 Dennis Lang (LanDen Labs) landenlabs@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -36,6 +36,7 @@ import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -115,7 +116,7 @@ public class GpsFragment extends DevFragment implements
     private static final SimpleDateFormat s_hour24Format = new SimpleDateFormat("HH:mm:ss", s_locale);
     private static final SimpleDateFormat s_time12Format = new SimpleDateFormat("MMM-dd hh:mm a", s_locale);
     private static final SimpleDateFormat s_time24Format = new SimpleDateFormat("MMM-dd HH:mm", s_locale);
-    ;
+
     private static SimpleDateFormat s_hourFormat = s_hour24Format;
 
 
@@ -230,7 +231,7 @@ public class GpsFragment extends DevFragment implements
             }
         });
 
-        m_list.clear();;
+        m_list.clear();
         // ---- Get UI components  ----
         for (int idx = 0; idx != s_maxRows; idx++)
             m_list.add(null);
@@ -295,7 +296,9 @@ public class GpsFragment extends DevFragment implements
         */
         // GpsReceiver m_gpsReceiver = new GpsReceiver();
         m_intentFilter.addAction(GpsReceiver.GPS_ENABLED_CHANGE_ACTION);
-        m_intentFilter.addAction(LocationManager.MODE_CHANGED_ACTION);
+        if (Build.VERSION.SDK_INT >= 19) {
+            m_intentFilter.addAction(LocationManager.MODE_CHANGED_ACTION);
+        }
         m_intentFilter.addAction(GpsReceiver.GPS_FIX_CHANGE_ACTION);
         m_intentFilter.addAction(LocationManager.PROVIDERS_CHANGED_ACTION);
 
@@ -451,32 +454,36 @@ public class GpsFragment extends DevFragment implements
         if (getActivity() != null) {
             final LocationManager locMgr = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
-            gpsStatus = locMgr.getGpsStatus(gpsStatus);
-            String msg = "";
-            switch (event) {
-                case GpsStatus.GPS_EVENT_STARTED:
-                    msg = "GPS event started";
-                    break;
-                case GpsStatus.GPS_EVENT_STOPPED:
-                    msg = "GPS event stopped";
-                    break;
-                case GpsStatus.GPS_EVENT_FIRST_FIX:
-                    msg = "GPS first fix";
-                    break;
-                case GpsStatus.GPS_EVENT_SATELLITE_STATUS:
-                    msg = "GPS sat status";
-                    break;
-            }
-
-            if (TextUtils.isEmpty(msg)) {
-                addMsgToDetailRow(s_colorGps, msg);
-                GpsItem gpsItem = m_lastUpdates.get(STATUS_CB);
-                if (gpsItem != null) {
-                    gpsItem.set(System.currentTimeMillis(), msg);
-                    listChanged();
+            try {
+                gpsStatus = locMgr.getGpsStatus(gpsStatus);
+                String msg = "";
+                switch (event) {
+                    case GpsStatus.GPS_EVENT_STARTED:
+                        msg = "GPS event started";
+                        break;
+                    case GpsStatus.GPS_EVENT_STOPPED:
+                        msg = "GPS event stopped";
+                        break;
+                    case GpsStatus.GPS_EVENT_FIRST_FIX:
+                        msg = "GPS first fix";
+                        break;
+                    case GpsStatus.GPS_EVENT_SATELLITE_STATUS:
+                        msg = "GPS sat status";
+                        break;
                 }
+
+                if (TextUtils.isEmpty(msg)) {
+                    addMsgToDetailRow(s_colorGps, msg);
+                    GpsItem gpsItem = m_lastUpdates.get(STATUS_CB);
+                    if (gpsItem != null) {
+                        gpsItem.set(System.currentTimeMillis(), msg);
+                        listChanged();
+                    }
+                }
+                showProviders();
+            } catch (SecurityException ex) {
+                Log.e(TAG, ex.getMessage());
             }
-            showProviders();
         }
     }
 

@@ -1,6 +1,6 @@
 package com.landenlabs.all_devtool;
 
-/**
+/*
  * Copyright (c) 2016 Dennis Lang (LanDen Labs) landenlabs@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -319,7 +319,7 @@ public class FileBrowserFragment extends DevFragment
                             "\nStorage Free: %d MB\nStorage Size: %d MB\nStorage ID: %d\nFileSize: %s\n",
                             freeMb, sizeMb, devID, FileUtil.getSizeStr(depthSize)));
                     try {
-                        fileSb.append("Path:" + fileInfo.getCanonicalPath().replaceAll("/", "/\n  "));
+                        fileSb.append("Path:").append(fileInfo.getCanonicalPath().replaceAll("/", "/\n  "));
                     } catch (IOException ex) {
 
                     }
@@ -616,7 +616,10 @@ public class FileBrowserFragment extends DevFragment
                 m_dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
                 break;
             case R.id.filebrowser_documents:
-                m_dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+                if (Build.VERSION.SDK_INT >= 19)
+                    m_dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+                else
+                    m_dir = Environment.getExternalStorageDirectory();
                 break;
             case R.id.filebrowser_movies:
                 m_dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
@@ -666,7 +669,7 @@ public class FileBrowserFragment extends DevFragment
 
         FileUtil.DirInfo button = new FileUtil.DirInfo(m_dirBar.getContext(), dir);
         m_dirBar.addView(button);
-        button.setTag(new Integer(m_dirList.size()));
+        button.setTag(Integer.valueOf(m_dirList.size()));
         button.setTextColor(0xff000000);
 
         button.setOnClickListener(new View.OnClickListener() {
@@ -711,7 +714,9 @@ public class FileBrowserFragment extends DevFragment
      */
     void loadFiles(String dir) {
 
-        checkPermissions(Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (Build.VERSION.SDK_INT >= 16) {
+            checkPermissions(Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
 
         m_workList.clear();
         try {

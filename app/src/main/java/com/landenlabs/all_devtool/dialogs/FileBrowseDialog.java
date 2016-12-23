@@ -429,6 +429,6 @@ public class FileBrowseDialog {
 
     // Callback interface for selected directory
     public interface SimpleFileDialogListener {
-        public void onChosenDir(String chosenDir);
+        void onChosenDir(String chosenDir);
     }
 }

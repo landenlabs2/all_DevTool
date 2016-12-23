@@ -1,6 +1,6 @@
 package com.landenlabs.all_devtool;
 
-/**
+/*
  * Copyright (c) 2016 Dennis Lang (LanDen Labs) landenlabs@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -360,7 +360,7 @@ public class ConsoleFragment extends DevFragment implements View.OnClickListener
                             getContext().getPackageName(), PackageManager.GET_PERMISSIONS);
                     for (int i = 0; i < pi.requestedPermissions.length; i++) {
                         if ((pi.requestedPermissionsFlags[i] & PackageInfo.REQUESTED_PERMISSION_GRANTED) != 0) {
-                            permSb.append(pi.requestedPermissions[i] + "\n");
+                            permSb.append(pi.requestedPermissions[i]).append("\n");
                             lines++;
                         }
                     }
@@ -416,7 +416,8 @@ public class ConsoleFragment extends DevFragment implements View.OnClickListener
 
         try {
             // ----- Network WiFi-----
-            WifiManager wifiMgr = (WifiManager) getActivity().getSystemService(Context.WIFI_SERVICE);
+
+            WifiManager wifiMgr = (WifiManager) getContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             if (wifiMgr != null && wifiMgr.isWifiEnabled() && wifiMgr.getDhcpInfo() != null) {
                 DhcpInfo dhcpInfo = wifiMgr.getDhcpInfo();
                 mNetworkViews.get(NETWORK_WIFI_IP).get(1).setText(Formatter.formatIpAddress(dhcpInfo.ipAddress));

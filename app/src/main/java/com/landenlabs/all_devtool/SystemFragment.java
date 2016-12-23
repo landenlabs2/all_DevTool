@@ -1,6 +1,6 @@
 package com.landenlabs.all_devtool;
 
-/**
+/*
  * Copyright (c) 2016 Dennis Lang (LanDen Labs) landenlabs@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -173,7 +173,7 @@ public class SystemFragment extends DevFragment {
                 });
             }
         }
-    };
+    }
 
     SystemBroadcastReceiver mSystemBroadcastReceiver;
 
@@ -478,7 +478,7 @@ public class SystemFragment extends DevFragment {
                                 if (!inetAddress.isLoopbackAddress()) {
                                     if (inetAddress.getHostAddress() != null) {
                                         String ipType = (inetAddress instanceof Inet4Address) ? "IPv4" : "IPv6";
-                                        netListStr.put(intf.getName() + " " + ipType, inetAddress.getHostAddress().toString());
+                                        netListStr.put(intf.getName() + " " + ipType, inetAddress.getHostAddress());
                                     }
                                     // if (!TextUtils.isEmpty(inetAddress.getHostName()))
                                     //     listStr.put( "HostName", inetAddress.getHostName());
@@ -578,7 +578,7 @@ public class SystemFragment extends DevFragment {
         }
 
         // --------------- Wifi Services -------------
-        final WifiManager wifiMgr = (WifiManager) getActivity().getSystemService(Context.WIFI_SERVICE);
+    final WifiManager wifiMgr = (WifiManager) getContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
         if (wifiMgr != null && wifiMgr.isWifiEnabled() && wifiMgr.getDhcpInfo() != null) {
 
@@ -879,7 +879,7 @@ public class SystemFragment extends DevFragment {
 
     private void clean_networks() {
         StringBuilder sb = new StringBuilder();
-        final WifiManager wifiMgr = (WifiManager) getActivity().getSystemService(Context.WIFI_SERVICE);
+        final WifiManager wifiMgr = (WifiManager) getContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         if (wifiMgr != null && wifiMgr.isWifiEnabled() && wifiMgr.getDhcpInfo() != null) {
             try {
                 List<WifiConfiguration> listWifiCfg = wifiMgr.getConfiguredNetworks();
@@ -917,7 +917,7 @@ public class SystemFragment extends DevFragment {
 
                 StringBuilder res1 = new StringBuilder();
                 for (byte b : macBytes) {
-                    res1.append(Integer.toHexString(b & 0xFF) + ":");
+                    res1.append(Integer.toHexString(b & 0xFF)).append(":");
                 }
 
                 if (res1.length() > 0) {

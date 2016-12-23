@@ -1,6 +1,6 @@
 package com.landenlabs.all_devtool;
 
-/**
+/*
  * Copyright (c) 2016 Dennis Lang (LanDen Labs) landenlabs@gmail.com
  * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -48,6 +48,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.util.SparseArray;
+import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -175,10 +176,10 @@ public class SensorFragment extends DevFragment
     long m_sleepMsec = 100;
     int m_menuSelected = R.id.sensor_menu_100_msec;
     String m_domainLabel = "1/100 sec";
-    static SparseArray<Integer> m_menuIdToMsec;
+    static SparseIntArray m_menuIdToMsec;
 
     static {
-        m_menuIdToMsec = new SparseArray<Integer>();
+        m_menuIdToMsec = new SparseIntArray();
         m_menuIdToMsec.put(R.id.sensor_menu_100_msec, 100);
         m_menuIdToMsec.put(R.id.sensor_menu_1_second, 1000 * 1);
         m_menuIdToMsec.put(R.id.sensor_menu_5_seconds, 1000 * 5);
@@ -301,7 +302,9 @@ public class SensorFragment extends DevFragment
             m_sensorList.add(m_sensorMgr.getDefaultSensor(Sensor.TYPE_GYROSCOPE));
             m_sensorList.add(m_sensorMgr.getDefaultSensor(Sensor.TYPE_PRESSURE));
             m_sensorList.add(m_sensorMgr.getDefaultSensor(Sensor.TYPE_GRAVITY));
-            m_sensorList.add(m_sensorMgr.getDefaultSensor(Sensor.TYPE_STEP_COUNTER));
+            if (Build.VERSION.SDK_INT >= 19) {
+                m_sensorList.add(m_sensorMgr.getDefaultSensor(Sensor.TYPE_STEP_COUNTER));
+            }
         }
 
         //  ToDo - add multi-checkboxes instead of single.
@@ -369,7 +372,7 @@ public class SensorFragment extends DevFragment
             case R.id.sensor_menu_1_minute:
             case R.id.sensor_menu_10_minutes:
                 m_menuSelected = id;
-                m_sleepMsec = m_menuIdToMsec.get(id).intValue();
+                m_sleepMsec = m_menuIdToMsec.get(id);
                 m_domainLabel = m_menuIdToLbl.get(id);
                 m_plot.setDomainLabel(m_domainLabel);
                 break;
@@ -754,7 +757,7 @@ public class SensorFragment extends DevFragment
             m_plotValues.put(AUDIO_STR, String.format("%.0f Avg:%.0f", dbValue, avgDb));
         }
 
-        WifiManager wifiMgr = (WifiManager) getActivity().getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiMgr = (WifiManager) getContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         if (wifiMgr != null && wifiMgr.isWifiEnabled() && wifiMgr.getDhcpInfo() != null && m_seriesWifi != null) {
             WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
             int numberOfLevels = 10;

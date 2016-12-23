@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Dev Tool</string>
+    <string name="app_name">all DevTool</string>
     <string name="Theme">Theme</string>
     <string name="app_description">Display build info, text sizes, themes, screen size</string>
 

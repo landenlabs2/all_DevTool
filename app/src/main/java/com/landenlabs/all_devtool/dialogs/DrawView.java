@@ -16,7 +16,7 @@ import com.landenlabs.all_devtool.util.ObjUtil;
 
 import java.util.ArrayList;
 
-/**
+/*
  * Copyright (c) 2016 Dennis Lang (LanDen Labs) landenlabs@gmail.com
  * <p/>
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -62,7 +62,7 @@ public class DrawView extends View {
 
     public interface TouchInfo {
         void onTouchInfo(MotionEvent event);
-    };
+    }
 
     private TouchInfo m_touchInfo;
 
