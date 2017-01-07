@@ -1,6 +1,6 @@
-### Android Dev Stuff v1.9.1
+### a LanDen Labs - DevTool
 
-***apk v1.9.1  available in app directory.***
+***apk v1.9.13  available in app directory.***
 
 WebSite
 [http://landenlabs.com/android/devstuff/index.html](http://landenlabs.com/android/devstuff/index.html)
