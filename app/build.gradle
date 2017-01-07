@@ -6,12 +6,7 @@ File zipDstDir = file('../zip')
 
 android {
     signingConfigs {
-        config {
-            keyAlias 'all_devtool'
-            keyPassword 'Salem2nh-k'
-            storeFile file('/Users/Dennis Lang/Dropbox/android/keystores/all_devtool.jks')
-            storePassword 'Salem2nh-d'
-        }
+        release
     }
     compileSdkVersion 24
     buildToolsVersion '24.0.3'
@@ -19,10 +14,10 @@ android {
         applicationId 'com.landenlabs.all_devtool'
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 1912
-        versionName '1.9.12'
-        signingConfig signingConfigs.config
-        targetSdkVersion.apiString
+        versionCode 1913
+        versionName '1.9.13'
+        // signingConfig signingConfigs.release
+        // targetSdkVersion.apiString
         resValue "string", "targetSdkVersion", targetSdkVersion.apiString
         resValue "string", "compileSdkVersion", compileSdkVersion
         resValue "string", "buildToolsVersion", buildToolsVersion
@@ -37,7 +32,7 @@ android {
                 appendVersionNameVersionCode(variant, defaultConfig)
             }
 
-            signingConfig signingConfigs.config
+            signingConfig signingConfigs.release
         }
         debug {
             minifyEnabled false
@@ -57,6 +52,14 @@ android {
     }
     compileOptions {
     }
+
+    // Load signing config.
+    def props = new Properties()
+    props.load(new FileInputStream(rootProject.file("release.properties")))
+    android.signingConfigs.release.storeFile rootProject.file(props.keyStore)
+    android.signingConfigs.release.storePassword props.keyStorePassword
+    android.signingConfigs.release.keyAlias props.keyAlias
+    android.signingConfigs.release.keyPassword props.keyAliasPassword
 }
 
 ext {

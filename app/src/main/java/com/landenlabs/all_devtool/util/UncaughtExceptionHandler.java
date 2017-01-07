@@ -22,6 +22,7 @@ public class UncaughtExceptionHandler implements Thread.UncaughtExceptionHandler
      */
     public UncaughtExceptionHandler() throws NullPointerException {
         originalHandler = Thread.getDefaultUncaughtExceptionHandler();
+        Thread.setDefaultUncaughtExceptionHandler(this);
     }
 
     @Override

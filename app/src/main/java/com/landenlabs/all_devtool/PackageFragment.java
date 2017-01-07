@@ -1302,6 +1302,24 @@ public class PackageFragment extends DevFragment
         }
     }
 
+    List<PackageInfo>  mergePackages(List<PackageInfo> pkgMain, List<PackageInfo> pkgAdd) {
+        if (pkgAdd != null) {
+            for (int addIdx = 0; addIdx < pkgAdd.size(); addIdx++) {
+                PackageInfo addInfo = pkgAdd.get(addIdx);
+                boolean dup = false;
+                for (int mainIdx = 0; !dup && mainIdx < pkgMain.size(); mainIdx++) {
+                    PackageInfo mainInfo = pkgMain.get(mainIdx);
+                    dup = mainInfo.packageName.equals(addInfo.packageName);
+                }
+                if (!dup) {
+                    pkgMain.add(addInfo);
+                }
+            }
+        }
+
+        return pkgMain;
+    }
+
     interface IPackageStatsObserver1 {
         void onGetStatsCompleted(PackageStats pStats, boolean succeeded);
     }
@@ -1422,11 +1440,23 @@ public class PackageFragment extends DevFragment
             m_workList = new ArrayList<PackingItem>();
 
             // PackageManager.GET_SIGNATURES | PackageManager.GET_PERMISSIONS | PackageManager.GET_PROVIDERS;
-            int flags = PackageManager.GET_META_DATA
+            int flags1 = PackageManager.GET_META_DATA
                     | PackageManager.GET_SHARED_LIBRARY_FILES
                     | PackageManager.GET_INTENT_FILTERS;
+            int flags2 = PackageManager.GET_META_DATA
+                    | PackageManager.GET_SHARED_LIBRARY_FILES;
+            int flags3 = PackageManager.GET_META_DATA;
+            int flags4 = 0;
 
-            List<PackageInfo> packList = getActivity().getPackageManager().getInstalledPackages(flags);
+            List<PackageInfo> packList = getActivity().getPackageManager().getInstalledPackages(flags1);
+            /*
+            packList = mergePackages(packList,
+                    getActivity().getPackageManager().getInstalledPackages(flags2));
+            packList = mergePackages(packList,
+                    getActivity().getPackageManager().getInstalledPackages(flags3));
+            packList = mergePackages(packList,
+                    getActivity().getPackageManager().getInstalledPackages(flags4));
+            */
 
             if (packList != null)
                 for (int idx = 0; idx < packList.size(); idx++) {
@@ -1438,10 +1468,10 @@ public class PackageFragment extends DevFragment
                         continue;   // Bad package
                     }
 
-                    Context mContext;
+                    Context pkgContext;
                     try {
                         m_log.d(String.format("%3d/%d : %s", idx, packList.size(), packInfo.packageName));
-                        mContext = getActivity().createPackageContext(packInfo.packageName, Context.CONTEXT_IGNORE_SECURITY);
+                        pkgContext = getActivity().createPackageContext(packInfo.packageName, Context.CONTEXT_IGNORE_SECURITY);
                     } catch (Exception ex) {
                         m_log.e(ex.getLocalizedMessage());
                         continue;   // Bad package
@@ -1449,12 +1479,14 @@ public class PackageFragment extends DevFragment
 
                     File cacheDirectory = null;
                     Utils.DirSizeCount cacheDirSize = null;
-                    if (mContext.getCacheDir() != null) {
-                        cacheDirectory = mContext.getCacheDir();
+                    if (pkgContext.getCacheDir() != null) {
+                        cacheDirectory = pkgContext.getCacheDir();
                     } else {
                         // cacheDirectory = new File(mContext.getPackageResourcePath());
-                        String dataPath = mContext.getFilesDir().getPath(); // "/data/data/"
-                        cacheDirectory = new File(dataPath, mContext.getPackageName() + "/cache");
+                        if (pkgContext.getFilesDir() != null) {
+                            String dataPath = pkgContext.getFilesDir().getPath(); // "/data/data/"
+                            cacheDirectory = new File(dataPath, pkgContext.getPackageName() + "/cache");
+                        }
                     }
 
                     if (cacheDirectory != null)
@@ -1613,7 +1645,7 @@ public class PackageFragment extends DevFragment
                 }
 
         } catch (Exception ex) {
-            // m_log.e(ex.getMessage());
+            m_log.e(ex.getMessage());
         }
     }
 

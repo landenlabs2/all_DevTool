@@ -88,7 +88,7 @@ public class DevToolActivity extends FragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // m_uncaughtExceptionHandler = new UncaughtExceptionHandler();
+        m_uncaughtExceptionHandler = new UncaughtExceptionHandler();
         boolean DEBUG = (getApplicationInfo().flags & 2) != 0;
         AppCrash.initalize(getApplication(), DEBUG);
 
