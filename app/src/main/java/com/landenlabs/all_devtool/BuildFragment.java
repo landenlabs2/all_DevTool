@@ -39,6 +39,7 @@ import com.landenlabs.all_devtool.util.Ui;
 import com.landenlabs.all_devtool.util.Utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -112,6 +113,16 @@ public class BuildFragment extends DevFragment {
             addBuild("BRAND", Build.BRAND);
             addBuild("CPU_ABI", Build.CPU_ABI);
             addBuild("CPU_ABI2", Build.CPU_ABI2);
+            addBuild("OS.ARCH", System.getProperty("os.arch"));
+            if (Build.VERSION.SDK_INT >= 21) {
+                // addBuild("SUPPORTED_ABIS", Arrays.toString(Build.SUPPORTED_ABIS));
+                if (Build.SUPPORTED_32_BIT_ABIS != null && Build.SUPPORTED_32_BIT_ABIS.length > 0) {
+                    addBuild("32_BIT_ABIS", Arrays.toString(Build.SUPPORTED_32_BIT_ABIS));
+                } else {
+                    addBuild("64_BIT_ABIS", Arrays.toString(Build.SUPPORTED_64_BIT_ABIS));
+                }
+            }
+
             addBuild("DEVICE", Build.DEVICE);
             addBuild("DISPLAY", Build.DISPLAY);
             addBuild("FINGERPRINT", Build.FINGERPRINT);

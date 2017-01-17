@@ -86,7 +86,10 @@ import java.util.Map;
  * @author Dennis Lang
  */
 public class FileBrowserFragment extends DevFragment
-        implements  View.OnClickListener, View.OnLayoutChangeListener, AdapterView.OnItemSelectedListener {
+        implements  View.OnClickListener
+        , View.OnLayoutChangeListener
+        , AdapterView.OnItemSelectedListener
+        , FileUtil.ExecCallback {
 
     // Logger - set to LLog.DBG to only log in Debug build, use LLog.On for always log.
     private final LLog m_log = LLog.DBG;
@@ -360,6 +363,7 @@ public class FileBrowserFragment extends DevFragment
         m_expand_collapse_toggle.setOnClickListener(this);
 
         setShowDir();
+        // TODO - request permission
         updateList();
         return m_rootView;
     }
@@ -737,6 +741,13 @@ public class FileBrowserFragment extends DevFragment
             if (m_errMsg == null)
                 m_errMsg = new StringBuilder();
             m_errMsg.append(ex.getMessage()).append("\n");
+
+            /*
+            m_errMsg = null;
+            AsyncTaskCompat.executeParallel(
+                FileUtil.getAsyncExec(this, new StringBuilder(), new String[] {"sh", "-c", "id"} ));
+               */
+
         } catch (Exception ex) {
             if (m_errMsg == null)
                 m_errMsg = new StringBuilder();
@@ -747,6 +758,9 @@ public class FileBrowserFragment extends DevFragment
         m_handler.sendMessage(msgObj);
     }
 
+    public void ExecCallback(StringBuilder result, int flag) {
+        Ui.ShowMessage(FileBrowserFragment.this.getActivity(), result.toString());
+    }
     
     void updateDeleteBtn() {
         m_fbDeletelBtn.setEnabled(m_checkCnt != 0);
