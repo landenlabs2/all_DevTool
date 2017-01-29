@@ -14,8 +14,8 @@ android {
         applicationId 'com.landenlabs.all_devtool'
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 1914
-        versionName '1.9.14'
+        versionCode 1915
+        versionName '1.9.15'
         // signingConfig signingConfigs.release
         // targetSdkVersion.apiString
         resValue "string", "targetSdkVersion", targetSdkVersion.apiString
@@ -81,13 +81,13 @@ dependencies {
     compile "com.google.android.gms:play-services-analytics:${playServicesVersion}"
     compile "com.google.android.gms:play-services-location:${playServicesVersion}"
     compile "com.google.android.gms:play-services-drive:${playServicesVersion}"
+
     compile 'net.hockeyapp.android:HockeySDK:4.1.1'
 
     // 3rdparty libraries
     // Memory leaks tool - see main activity to see LeakCanary.install(this.getApplication());
     // debugCompile "com.squareup.leakcanary:leakcanary-android:${leakCanaryVersion}"
     // releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
-
     compile 'com.androidplot:androidplot-core:1.4.0'
     compile 'net.danlew:android.joda:2.9.2'
 }

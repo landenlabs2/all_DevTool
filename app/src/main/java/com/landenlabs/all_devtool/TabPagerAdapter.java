@@ -70,7 +70,7 @@ public class TabPagerAdapter extends FragmentPagerAdapter implements ActionBar.T
     }
 
     private Creator[] m_tabList = new Creator[]{
-            // 1
+            // Build
             new Creator() {
                 public DevFragment creator() {
                     return BuildFragment.create();
@@ -81,7 +81,30 @@ public class TabPagerAdapter extends FragmentPagerAdapter implements ActionBar.T
                 }
             },
 
-            // 2
+            // Proc
+            new Creator() {
+                public DevFragment creator() {
+                    return ProcFragment.create();
+                }
+
+                public String name() {
+                    return ProcFragment.s_name;
+                }
+            },
+
+            // Disk
+            new Creator() {
+                public DevFragment creator() {
+                    return DiskFragment.create();
+                }
+
+                public String name() {
+                    return DiskFragment.s_name;
+                }
+            },
+
+
+            // System
             new Creator() {
                 public DevFragment creator() {
                     return SystemFragment.create();
@@ -92,7 +115,7 @@ public class TabPagerAdapter extends FragmentPagerAdapter implements ActionBar.T
                 }
             },
 
-            // 3
+            // Package
             new Creator() {
                 public DevFragment creator() {
                     return PackageFragment.create();
@@ -103,7 +126,7 @@ public class TabPagerAdapter extends FragmentPagerAdapter implements ActionBar.T
                 }
             },
 
-            // 4
+            // File Browser
             new Creator() {
                 public DevFragment creator() {
                     return FileBrowserFragment.create();
@@ -114,7 +137,7 @@ public class TabPagerAdapter extends FragmentPagerAdapter implements ActionBar.T
                 }
             },
 
-            // 5
+            // Console
             new Creator() {
                 public DevFragment creator() {
                     return ConsoleFragment.create();
@@ -125,7 +148,7 @@ public class TabPagerAdapter extends FragmentPagerAdapter implements ActionBar.T
                 }
             },
 
-            // 6
+            // Sensor
             new Creator() {
                 public DevFragment creator() {
                     return SensorFragment.create();
@@ -136,7 +159,7 @@ public class TabPagerAdapter extends FragmentPagerAdapter implements ActionBar.T
                 }
             },
 
-            // 7
+            // Theme
             new Creator() {
                 public DevFragment creator() {
                     return ThemeFragment.create();
@@ -147,7 +170,7 @@ public class TabPagerAdapter extends FragmentPagerAdapter implements ActionBar.T
                 }
             },
 
-            // 8
+            // Clock
             new Creator() {
                 public DevFragment creator() {
                     return ClockFragment.create();
@@ -158,7 +181,7 @@ public class TabPagerAdapter extends FragmentPagerAdapter implements ActionBar.T
                 }
             },
 
-            // 9
+            // Gps
             new Creator() {
                 public DevFragment creator() {
                     return GpsFragment.create();
@@ -169,7 +192,7 @@ public class TabPagerAdapter extends FragmentPagerAdapter implements ActionBar.T
                 }
             },
 
-            // 10
+            // Screen
             new Creator() {
                 public DevFragment creator() {
                     return ScreenFragment.create();
@@ -180,7 +203,7 @@ public class TabPagerAdapter extends FragmentPagerAdapter implements ActionBar.T
                 }
             },
 
-            // 11
+            // Text
             new Creator() {
                 public DevFragment creator() {
                     return TextFragment.create();
@@ -191,7 +214,7 @@ public class TabPagerAdapter extends FragmentPagerAdapter implements ActionBar.T
                 }
             },
 
-            // 12
+            // Icon Draw
             new Creator() {
                 public DevFragment creator() {
                     return IconDrawFragment.create();
@@ -202,7 +225,7 @@ public class TabPagerAdapter extends FragmentPagerAdapter implements ActionBar.T
                 }
             },
 
-            // 13
+            // Icon Attr
             new Creator() {
                 public DevFragment creator() {
                     return IconAttrFragment.create();
@@ -213,7 +236,7 @@ public class TabPagerAdapter extends FragmentPagerAdapter implements ActionBar.T
                 }
             },
 
-            // 14
+            // Num Attr
             new Creator() {
                 public DevFragment creator() {
                     return NumAttrFragment.create();
