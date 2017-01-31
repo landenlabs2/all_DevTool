@@ -23,29 +23,40 @@ package com.landenlabs.all_devtool;
  *
  */
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.CheckBox;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import com.landenlabs.all_devtool.util.Ui;
 import com.landenlabs.all_devtool.util.Utils;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 /**
  * Display "Build" system information.
@@ -54,10 +65,24 @@ import java.util.Map;
  */
 public class DiskFragment extends DevFragment {
 
-    final ArrayList<ProcInfo> m_list = new ArrayList<ProcInfo>();
+    final ArrayList<GroupInfo> m_list = new ArrayList<GroupInfo>();
     ExpandableListView m_listView;
     TextView m_titleTime;
+    CheckBox m_writeGrantedCb;
+    CheckBox m_diskUsageCb;
+    CheckBox m_fileSystemCb;
+    CheckBox m_diskStatsCb;
 
+    Map<String, String> m_javaDirList;
+    Map<String, String> m_diskStats;
+    Map<String, String> m_duList;
+    Map<String, String> m_lsList;
+    Map<String, String> m_duMntList;
+    Map<String, String> m_mntList;
+    Map<String, String> m_duStorageList;
+    Map<String, String> m_duSdcardList;
+    Map<String, String> m_dfList;
+    
     private static SimpleDateFormat m_timeFormat = new SimpleDateFormat("HH:mm:ss zz");
 
     public static String s_name = "Disk";
@@ -91,17 +116,53 @@ public class DiskFragment extends DevFragment {
                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        View rootView = inflater.inflate(R.layout.proc_tab, container, false);
-        Ui.<TextView>viewById(rootView, R.id.procListTitle).setText(R.string.proc_title);
-        m_listView = Ui.viewById(rootView, R.id.procListView);
+        View rootView = inflater.inflate(R.layout.disk_tab, container, false);
+        Ui.<TextView>viewById(rootView, R.id.diskListTitle).setText(R.string.disk_title);
+        m_listView = Ui.viewById(rootView, R.id.diskListView);
 
-        m_titleTime = Ui.viewById(rootView, R.id.procListTime);
+        m_titleTime = Ui.viewById(rootView, R.id.diskListTime);
         m_titleTime.setVisibility(View.VISIBLE);
         m_titleTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateList();
+                updateList(true);
                 m_listView.invalidateViews();
+            }
+        });
+
+        m_writeGrantedCb = Ui.viewById(rootView, R.id.diskGrantCb);
+        m_writeGrantedCb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                grantWritePermission();
+                updateList(true);
+            }
+        });
+
+        m_writeGrantedCb.setChecked(hasWritePermission());
+
+
+        m_diskUsageCb = Ui.viewById(rootView, R.id.diskUsageCb);
+        m_diskUsageCb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateList(true);
+            }
+        });
+
+        m_fileSystemCb = Ui.viewById(rootView, R.id.fileSystemCb);
+        m_fileSystemCb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateList(true);
+            }
+        });
+
+        m_diskStatsCb = Ui.viewById(rootView, R.id.diskStatsCb);
+        m_diskStatsCb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateList(true);
             }
         });
 
@@ -112,7 +173,54 @@ public class DiskFragment extends DevFragment {
     @Override
     public void onResume() {
         super.onResume();
-        updateList();
+        updateList(false);
+    }
+
+    // ============================================================================================
+    // Permission
+
+    private boolean hasWritePermission() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            return getContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED;
+        }
+        return true;
+    }
+    private void grantWritePermission() {
+        checkPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        // checkPermissions(Manifest.permission.DUMP);
+    }
+
+    private static final int MY_PERMISSIONS_REQUEST = 28;
+    private boolean checkPermissions(String needPermission) {
+        boolean okay = true;
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (getContext().checkSelfPermission(needPermission) != PackageManager.PERMISSION_GRANTED) {
+                okay = false;
+                requestPermissions(new String[]{ needPermission }, MY_PERMISSIONS_REQUEST);
+            } else {
+                m_writeGrantedCb.setText("Grant Write");
+                m_writeGrantedCb.setChecked(true);
+                updateList(true);
+            }
+        }
+
+        return okay;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    m_writeGrantedCb.setText("Grant Write");
+                    m_writeGrantedCb.setChecked(true);
+                } else {
+                    m_writeGrantedCb.setText("Grant Write [Failed]");
+                    m_writeGrantedCb.setChecked(false);
+                }
+                updateList(true);
+            }
+        }
     }
 
     // ============================================================================================
@@ -121,69 +229,113 @@ public class DiskFragment extends DevFragment {
     /**
      * Populate list with 'Build' parameters.
      */
-    void updateList() {
+    void updateList(boolean force) {
+        if (!m_list.isEmpty() && !force)
+            return;
+        
         // Time today = new Time(Time.getCurrentTimezone());
         // today.setToNow();
         // today.format(" %H:%M:%S")
         Date dt = new Date();
         m_titleTime.setText(m_timeFormat.format(dt));
 
-        if (m_list.isEmpty()) {
-            if (true) {
-                try {
-                    if (Build.VERSION.SDK_INT >= 24) {
-                        addBuild("getFilesDir", getActivity().getApplicationContext().getDataDir());
-                    }
-                    try {
-                        addBuild("getDir(null)", getContext().getDir(null, Context.MODE_WORLD_READABLE));
-                    } catch (Exception ex) {}
-                    try {
-                        addBuild("getFilesDir", getActivity().getFilesDir());
-                    } catch (Exception ex) {}
+        m_list.clear();
+        addBuild("Permission", hasWritePermission() ? "Granted Write" : "Denied Write");
 
-                    try {
-                        addBuild("getCacheDir", getActivity().getCacheDir());
-                    } catch (Exception ex) {}
-
-                    if (false) {
-                        try {
-                            String FILENAME = "test.txt";
-                            String string = "hello world!";
-
-                            FileOutputStream fos = getContext().openFileOutput(FILENAME, Context.MODE_PRIVATE);
-                            fos.write(string.getBytes());
-                            addBuild("openFileOutput", fos.toString());
-                            fos.close();
-                        } catch (Exception ex) {
-                        }
-                    }
-
-                    try {
-                        addBuild("getExternalCacheDir", getActivity().getExternalCacheDir());
-                    } catch (Exception ex) {}
-
-                    try {
-                        // getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-                        addBuild("getExternalCacheDir", getActivity().getExternalFilesDir(null));
-                    } catch (Exception ex) {}
-
-                    addBuild("getExternalStorageDirectory", Environment.getExternalStorageDirectory());
-                    addBuild("getRootDirectory", Environment.getRootDirectory());
-
-
-                } catch (Exception ex) {
-                    addBuild("Exception", ex.getMessage());
+        if (true) {
+            m_javaDirList = new LinkedHashMap<>();
+            try {
+                if (Build.VERSION.SDK_INT >= 24) {
+                    addFile("getFilesDir", getActivity().getApplicationContext().getDataDir());
                 }
+                try {
+                    addFile("getDir(null)", getContext().getDir(null, Context.MODE_WORLD_READABLE));
+                } catch (Exception ex) {
+                }
+                try {
+                    addFile("getFilesDir", getActivity().getFilesDir());
+                } catch (Exception ex) {
+                }
+
+                try {
+                    addFile("getCacheDir", getActivity().getCacheDir());
+                } catch (Exception ex) {
+                }
+
+                if (false) {
+                    try {
+                        String FILENAME = "test.txt";
+                        String string = "hello world!";
+
+                        FileOutputStream fos = getContext().openFileOutput(FILENAME, Context.MODE_PRIVATE);
+                        fos.write(string.getBytes());
+                        addBuild("openFileOutput", fos.toString());
+                        fos.close();
+                    } catch (Exception ex) {
+                    }
+                }
+
+                try {
+                    addFile("getExternalCacheDir", getActivity().getExternalCacheDir());
+                } catch (Exception ex) {
+                }
+
+                try {
+                    // getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+                    addFile("getExternalCacheDir", getActivity().getExternalFilesDir(null));
+                } catch (Exception ex) {
+                }
+
+                addFile("getExternalStorageDirectory", Environment.getExternalStorageDirectory());
+                addFile("external downloads", Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS));
+                addFile("getRootDirectory", Environment.getRootDirectory());
+
+
+            } catch (Exception ex) {
+                addBuild("Exception", ex.getMessage());
             }
 
-            /*
-            ArrayList<String> cpuInfoList = getCpuInfoList();
-            for (String line : cpuInfoList) {
-                String[] vals = line.split(": ");
-                addBuild(vals[0], vals[1]);
-            }
-            */
+            addBuild("java dir\n[rwx]=owner [RWX]=world", m_javaDirList);
         }
+
+        if (true) {
+            if (false) {
+                m_lsList = getShellCmd(new String[]{"ls", "-l"});
+                addBuild("ls -l", m_lsList);
+            }
+            if (false) {
+                m_duList = getFileList(new String[] {"du", "-ks", "/"}, "[^ ]+ ([^:]+).*", "$1", ".*/(proc|acct|dev)/.*");
+                addBuild("du -ks /", m_duList);
+            }
+
+
+            if (m_fileSystemCb.isChecked()) {
+                m_dfList = getShellCmd(new String[] { "df" });
+                addBuild("df", m_dfList);
+
+                m_mntList = getShellCmd(new String[] {"mount"});
+                addBuild("mount", m_mntList);
+            }
+
+            if (m_diskUsageCb.isChecked()) {
+                m_duStorageList = getShellCmd(new String[]{"du", "-chHLd", "2", "/storage"});
+                addBuild("du -chHLd 2 /storage", m_duStorageList);
+
+                m_duMntList = getShellCmd(new String[]{"du", "-chHLd", "1", "/mnt/"});
+                addBuild("du -chHLs /mnt", m_duMntList);
+
+                m_duSdcardList = getShellCmd(new String[] { "du", "-chHL", "/sdcard/" });
+                addBuild("du -chHL /sdcard", m_duSdcardList);
+            }
+
+            if (m_diskStatsCb.isChecked()) {
+                m_diskStats = getShellCmd(new String[]{"dumpsys", "diskstats"});
+                readFile("/proc/diskstats");
+                addBuild("Disk Stats", m_diskStats);
+            }
+        }
+
+
         final BuildArrayAdapter adapter = new BuildArrayAdapter(this.getActivity());
         m_listView.setAdapter(adapter);
 
@@ -195,7 +347,7 @@ public class DiskFragment extends DevFragment {
     }
 
 
-    void addBuild(String name, File file) {
+    void addFile(String name, File file) {
         if (file != null) {
             char r = file.canRead() ? 'r' : '-';
             char w = file.canWrite() ? 'w' : '-';
@@ -205,27 +357,87 @@ public class DiskFragment extends DevFragment {
             x = file.setExecutable(true, false) ? 'X' : x;
 
             String rwStr = String.format("[%c%c%c] ", r,w, x);
-            m_list.add(new ProcInfo(name, rwStr + file.getAbsolutePath()));
+            m_javaDirList.put(name, rwStr + file.getAbsolutePath());
         }
     }
 
 
     void addBuild(String name, String value) {
         if (!TextUtils.isEmpty(value))
-            m_list.add(new ProcInfo(name, value.trim()));
+            m_list.add(new GroupInfo(name, value.trim()));
     }
 
     void addBuild(String name, Map<String, String> value) {
         if (!value.isEmpty())
-            m_list.add(new ProcInfo(name, value));
+            m_list.add(new GroupInfo(name, value));
     }
 
+    private Map<String, String> getShellCmd(String[] shellCmd) {
+        Map<String, String> mapList = new LinkedHashMap<>();
+        ArrayList<String> responseList = runShellCmd(shellCmd);
+        for (String line : responseList) {
+            String[] vals = line.split(": ");
+            if (vals.length > 1) {
+                mapList.put(vals[0], vals[1]);
+            } else {
+                mapList.put(line, "");
+            }
+        }
+        return mapList;
+    }
 
-    /*
-    public static ArrayList<String> getCpuInfoList() {
+    private Map<String, String> getFileList(String[] shellCmd, String regStr, String repStr, String excPat) {
+        Map<String, String> mapList = new LinkedHashMap<>();
+        ArrayList<String> responseList = runShellCmd(shellCmd);
+        for (String line : responseList) {
+            if (!line.matches(excPat)) {
+                line = line.replaceAll(regStr, repStr);
+                if (line.length() > 0) {
+                    try {
+                        File f1 = new File(line);
+                        mapList.put(line, "" + f1.length());
+                    } catch (Exception ex) {
+                        mapList.put(line, ex.getMessage());
+                    }
+                }
+            }
+        }
+        return mapList;
+    }
+
+    private static  ArrayList<String>  runShellCmd(String[] shellCmd) {
+       ArrayList<String> list = new ArrayList<String>();
+       try {
+           Process process = new ProcessBuilder()
+                   .command(shellCmd)
+                   .redirectErrorStream(true)
+                   .start();
+
+           // Process process = Runtime.getRuntime().exec(shellCmd);
+           BufferedReader bufferedReader = new BufferedReader(
+                   new InputStreamReader(process.getInputStream()));
+
+           String line = "";
+           while ((line = bufferedReader.readLine()) != null) {
+               list.add(line);
+           }
+       }
+       catch (IOException ex) {
+           list.add(ex.getLocalizedMessage());
+       }
+
+       return list;
+    }
+
+    /**
+     *
+     * @param diskFileName example /proc/cpuinfo
+     * @return
+     */
+    private static ArrayList<String> readFile(String diskFileName) {
         ArrayList<String> list = new ArrayList<String>();
         try {
-            Scanner scan = new Scanner(new File("/proc/cpuinfo"));
+            Scanner scan = new Scanner(new File(diskFileName));
             while (scan.hasNextLine()) {
                 String line = scan.nextLine();
                 String[] vals = line.split(": ");
@@ -235,31 +447,30 @@ public class DiskFragment extends DevFragment {
                 }
             }
         } catch (Exception e) {
-            Log.e("getCpuInfoMap",Log.getStackTraceString(e));}
+            Log.e("readFile",Log.getStackTraceString(e));}
         return list;
     }
-    */
 
     // =============================================================================================
 
 
-    class ProcInfo {
+    class GroupInfo {
         final String m_fieldStr;
         final String m_valueStr;
         final Map<String, String> m_valueList;
 
-        ProcInfo() {
+        GroupInfo() {
             m_fieldStr = m_valueStr = null;
             m_valueList = null;
         }
 
-        ProcInfo(String str1, String str2) {
+        GroupInfo(String str1, String str2) {
             m_fieldStr = str1;
             m_valueStr = str2;
             m_valueList = null;
         }
 
-        ProcInfo(String str1, Map<String, String> list2) {
+        GroupInfo(String str1, Map<String, String> list2) {
             m_fieldStr = str1;
             m_valueStr = null;
             m_valueList = list2;
@@ -311,7 +522,7 @@ public class DiskFragment extends DevFragment {
                                  final int childPosition, boolean isLastChild, View convertView,
                                  ViewGroup parent) {
 
-            ProcInfo buildInfo = m_list.get(groupPosition);
+            GroupInfo buildInfo = m_list.get(groupPosition);
 
             View expandView = convertView;
             // if (null == expandView) {
@@ -378,7 +589,7 @@ public class DiskFragment extends DevFragment {
         public View getGroupView(int groupPosition, boolean isExpanded,
                                  View convertView, ViewGroup parent) {
 
-            ProcInfo buildInfo = m_list.get(groupPosition);
+            GroupInfo buildInfo = m_list.get(groupPosition);
 
             View summaryView = convertView;
             if (null == summaryView) {
@@ -388,6 +599,7 @@ public class DiskFragment extends DevFragment {
             TextView textView = Ui.viewById(summaryView, R.id.buildField);
             textView.setText(buildInfo.fieldStr());
             textView.setPadding(10, 0, 0, 0);
+            textView.setTypeface(Typeface.MONOSPACE);
 
             textView = Ui.viewById(summaryView, R.id.buildValue);
             textView.setText(buildInfo.valueStr());
