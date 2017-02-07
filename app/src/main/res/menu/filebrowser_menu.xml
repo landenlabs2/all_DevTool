@@ -80,9 +80,18 @@
     </group>
 
     <item
+        android:checkable="true"
+        android:checked="true"
+        android:id="@id/filebrowser_show_extra"
+        app:showAsAction="always"
+        android:title="@string/filebrowser_show_extra" />
+
+    <!--
+    <item
         android:id="@id/filebrowser_search"
         app:showAsAction="always"
         android:title="@string/filebrowser_search" />
+    -->
 
     <item
         android:id="@id/filebrowser_delete"

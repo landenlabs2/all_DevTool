@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.system.StructStat;
 import android.util.Log;
+import android.widget.Button;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -155,12 +156,13 @@ public class FileUtil {
         }
     }
 
-    public static class DirInfo extends android.support.v7.widget.AppCompatButton {
+    public static class DirInfo extends Button {
         File m_dir;
         public DirInfo(Context context, File dir) {
             super(context);
             setText("/" + dir.getName());
             m_dir = dir;
+
         }
 
         public File getDir() {

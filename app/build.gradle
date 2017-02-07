@@ -14,8 +14,8 @@ android {
         applicationId 'com.landenlabs.all_devtool'
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 1916
-        versionName '1.9.16'
+        versionCode 1917
+        versionName '1.9.17'
         // signingConfig signingConfigs.release
         // targetSdkVersion.apiString
         resValue "string", "targetSdkVersion", targetSdkVersion.apiString
@@ -71,9 +71,9 @@ ext {
 dependencies {
     compile "com.android.support:support-v4:${supportLibVersion}"
     compile "com.android.support:appcompat-v7:${supportLibVersion}"
+
     //  compile "com.google.android.gms:play-services:${playServicesVersion}"
     //  compile "com.google.android.gms:play-services-ads:${playServicesVersion}"
-
     compile "com.google.android.gms:play-services-maps:${playServicesVersion}"
     compile "com.google.android.gms:play-services-identity:${playServicesVersion}"
     compile "com.google.android.gms:play-services-gcm:${playServicesVersion}"
@@ -88,6 +88,7 @@ dependencies {
     // Memory leaks tool - see main activity to see LeakCanary.install(this.getApplication());
     // debugCompile "com.squareup.leakcanary:leakcanary-android:${leakCanaryVersion}"
     // releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
+
     compile 'com.androidplot:androidplot-core:1.4.1'
     compile 'net.danlew:android.joda:2.9.2'
 }

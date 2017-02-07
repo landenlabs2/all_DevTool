@@ -100,6 +100,8 @@
 
 
     <HorizontalScrollView
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:id="@+id/fb_dirBarScroll"
         android:layout_below="@id/fb_plus_minus_toggle"
         android:layout_width="match_parent"

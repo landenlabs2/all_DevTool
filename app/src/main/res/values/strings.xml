@@ -128,6 +128,7 @@
     <string name="filebrowser_menu_expandAll">Expand All</string>
     <string name="filebrowser_delete">Delete</string>
     <string name="filebrowser_search">Search</string>
+    <string name="filebrowser_show_extra">Show Extra</string>
 
     <string-array name="fb_load_array">
         <item>Root</item>

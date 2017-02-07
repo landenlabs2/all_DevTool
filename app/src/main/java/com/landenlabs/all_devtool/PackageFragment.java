@@ -106,6 +106,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import static android.content.pm.ApplicationInfo.FLAG_ALLOW_BACKUP;
+
 
 /**
  * Display "Package" installed information.
@@ -311,9 +313,12 @@ public class PackageFragment extends DevFragment
         File storageDir = new File("/storage");
 
         try {
-            for (File sdcard : storageDir.listFiles()) {
-                if (sdcard.isDirectory()) {
-                    m_storageDirs.add(sdcard.getAbsolutePath());
+            File[] files = storageDir.listFiles();
+            if (files != null) {
+                for (File sdcard : files) {
+                    if (sdcard.isDirectory()) {
+                        m_storageDirs.add(sdcard.getAbsolutePath());
+                    }
                 }
             }
         } catch (Exception e) {
@@ -1392,6 +1397,22 @@ public class PackageFragment extends DevFragment
         }
 
         addList(pkgList, "Apk File", packInfo.applicationInfo.publicSourceDir);
+        StringBuilder flagStr = new StringBuilder();
+        if ((packInfo.applicationInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0)
+            flagStr.append(" Debug ");
+        if ((packInfo.applicationInfo.flags & ApplicationInfo.FLAG_IS_GAME) != 0)
+            flagStr.append(" Game ");
+        if ((packInfo.applicationInfo.flags & ApplicationInfo.FLAG_ALLOW_BACKUP) != 0)
+            flagStr.append(" AllowBackup ");
+        if ((packInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0)
+            flagStr.append(" System ");
+        if ((packInfo.applicationInfo.flags & ApplicationInfo.FLAG_LARGE_HEAP) != 0)
+            flagStr.append(" LargeHeap ");
+
+        if (flagStr.length() != 0) {
+            addList(pkgList, "Flags", flagStr.toString());
+        }
+
 
         if (packInfo.signatures != null) {
             String signatures = "";
@@ -1579,7 +1600,7 @@ public class PackageFragment extends DevFragment
 
                         // Add application info.
                         try {
-                            addList(pkgList, "Allow Backup", String.valueOf((packInfo.applicationInfo.flags & ApplicationInfo.FLAG_ALLOW_BACKUP) != 0));
+                            addList(pkgList, "Allow Backup", String.valueOf((packInfo.applicationInfo.flags & FLAG_ALLOW_BACKUP) != 0));
                             addList(pkgList, "Debuggable", String.valueOf((packInfo.applicationInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0));
                             addList(pkgList, "External Storage", String.valueOf((packInfo.applicationInfo.flags & ApplicationInfo.FLAG_EXTERNAL_STORAGE) != 0));
                             String themeName = getResourceName(packInfo, packInfo.applicationInfo.theme);

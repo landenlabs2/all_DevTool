@@ -45,4 +45,6 @@
     <item type="id" name="filebrowser_search" />
     <item type="id" name="filebrowser_show_perm" />
 
+    <item type="id" name="filebrowser_show_extra" />
+
 </resources>

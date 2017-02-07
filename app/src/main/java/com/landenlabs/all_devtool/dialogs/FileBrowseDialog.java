@@ -230,26 +230,29 @@ public class FileBrowseDialog {
             File dirFile = new File(dir);
 
             // If directory is not the base sd card directory add ".." for going up one directory
-            if ( ShowDirs)
+            if (ShowDirs)
                 dirs.add("..");
 
-            for (File file : dirFile.listFiles()) {
-                try {
-                    if (file.isDirectory()) {
-                        if (ShowDirs && file.getName().matches(DirPattern)) {
-                            // Add "/" to directory names to identify them in the list
-                            dirs.add("/" + file.getName());
+            File[] files= dirFile.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    try {
+                        if (file.isDirectory()) {
+                            if (ShowDirs && file.getName().matches(DirPattern)) {
+                                // Add "/" to directory names to identify them in the list
+                                dirs.add("/" + file.getName());
+                            }
+                        } else {
+                            if (ShowFiles && file.getName().matches(FilePattern)) {
+                                dirs.add(file.getName());
+                            }
                         }
-                    } else {
-                        if (ShowFiles && file.getName().matches(FilePattern)) {
-                            dirs.add(file.getName());
-                        }
+                    } catch (Exception ex) {
+                        Toast.makeText(m_context, ex.getMessage(), Toast.LENGTH_LONG).show();
                     }
-                } catch (Exception ex) {
-                    Toast.makeText(m_context, ex.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
-        } catch (Exception ex) {
+        } catch(Exception ex){
             Toast.makeText(m_context, ex.getMessage(), Toast.LENGTH_LONG).show();
         }
 
