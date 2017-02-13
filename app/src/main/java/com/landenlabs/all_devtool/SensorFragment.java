@@ -129,9 +129,13 @@ public class SensorFragment extends DevFragment
 
     private static final String[] SENSOR_NAMES =
             {
-                    WIFI_STR, BATTERY_STR, AUDIO_STR, ORIENTATION_STR, LIGHT_STR, PROCESSES_STR, MEMORY_STR,
-                    ACCELEROMETER_STR, MAGNETOMETER_STR, GYROSCOPE_STR,
-                    BAROMETER_STR, GRAVITY_STR, STEP_COUNTER_STR
+                    WIFI_STR, BATTERY_STR, AUDIO_STR, ORIENTATION_STR, LIGHT_STR, PROCESSES_STR, MEMORY_STR
+                    // , ACCELEROMETER_STR
+                    , MAGNETOMETER_STR
+                    // , GYROSCOPE_STR
+                    , BAROMETER_STR
+                    , GRAVITY_STR
+                    // , STEP_COUNTER_STR
             };
     String m_sensorName = WIFI_STR;
 
@@ -144,7 +148,7 @@ public class SensorFragment extends DevFragment
     static SimpleXYSeries m_seriesBattery;
     static SimpleXYSeries m_seriesAudio;
     static SimpleXYSeries m_seriesAudioAvg;
-    static SimpleXYSeries m_seriesAudioMax;
+    static SimpleXYSeries m_seriesAudioChg;
     static SimpleXYSeries m_seriesOrientation_az;
     static SimpleXYSeries m_seriesOrientation_pitch;
     static SimpleXYSeries m_seriesOrientation_roll;
@@ -152,7 +156,13 @@ public class SensorFragment extends DevFragment
     static SimpleXYSeries m_seriesProcCnt;
     static SimpleXYSeries m_seriesFreeMem;
 
+    static SimpleXYSeries m_seriesAccelerometer;
+    static SimpleXYSeries m_seriesMagnetometer;
+    static SimpleXYSeries m_seriesGyroscope;
     static SimpleXYSeries m_seriesBarometer;
+    static SimpleXYSeries m_seriesGravity;
+    static SimpleXYSeries m_seriesStepCounter;
+
 
     static Format mLineFmt = new Format() {
         @Override
@@ -258,8 +268,8 @@ public class SensorFragment extends DevFragment
             m_seriesAudio.useImplicitXVals();
             m_seriesAudioAvg = new SimpleXYSeries("Avg");
             m_seriesAudioAvg.useImplicitXVals();
-            m_seriesAudioMax = new SimpleXYSeries("Max");
-            m_seriesAudioMax.useImplicitXVals();
+            m_seriesAudioChg = new SimpleXYSeries("Chg");
+            m_seriesAudioChg.useImplicitXVals();
             m_seriesProcCnt = new SimpleXYSeries("Proc");
             m_seriesProcCnt.useImplicitXVals();
             m_seriesFreeMem = new SimpleXYSeries("Mem");
@@ -531,8 +541,8 @@ public class SensorFragment extends DevFragment
                 m_seriesAudio.useImplicitXVals();
                 m_seriesAudioAvg = new SimpleXYSeries("Avg");
                 m_seriesAudioAvg.useImplicitXVals();
-                m_seriesAudioMax = new SimpleXYSeries("Max");
-                m_seriesAudioMax.useImplicitXVals();
+                m_seriesAudioChg = new SimpleXYSeries("Chg");
+                // m_seriesAudioChg.useImplicitXVals();
             }
 
             if (m_soundMeter == null && checkPermissions(Manifest.permission.RECORD_AUDIO)) {
@@ -545,7 +555,7 @@ public class SensorFragment extends DevFragment
 
             m_plot.addSeries(m_seriesAudio, makeFormatter(2, Color.WHITE, Color.RED, 0, height, LINE_MODE));
             m_plot.addSeries(m_seriesAudioAvg, makeFormatter(1, Color.BLUE, Color.BLUE, 0, height, FILL_MODE));
-            // m_plot.addSeries(m_seriesAudioMax, makeFormatter(4, Color.RED, Color.RED, 0, height, LINE_MODE));
+            m_plot.addSeries(m_seriesAudioChg, makeFormatter(4, Color.RED, Color.RED, 0, height, LINE_MODE));
         } else if (m_sensorName.equals(PROCESSES_STR)) {
             if (m_seriesProcCnt == null) {
                 m_seriesProcCnt = new SimpleXYSeries("Proc");
@@ -608,6 +618,20 @@ public class SensorFragment extends DevFragment
 
             m_plot.setRangeLabel("Pressure mB");
             m_plot.addSeries(m_seriesBarometer, makeFormatter(lineFillWidth, Color.BLUE, Color.WHITE, 0, height, FILL_MODE));
+        } else if (m_sensorName.equals(MAGNETOMETER_STR)) {
+            if (m_seriesMagnetometer == null) {
+                m_seriesMagnetometer = new SimpleXYSeries("Magnetometer");
+                m_seriesMagnetometer.useImplicitXVals();
+            }
+            m_plot.setRangeBoundaries(0, 200, BoundaryMode.AUTO);
+            m_plot.addSeries(m_seriesMagnetometer, makeFormatter(lineFillWidth, Color.BLUE, Color.WHITE, 0, height, FILL_MODE));
+        } else if (m_sensorName.equals(GRAVITY_STR)) {
+            if (m_seriesGravity == null) {
+                m_seriesGravity = new SimpleXYSeries("Gravity");
+                m_seriesGravity.useImplicitXVals();
+            }
+            m_plot.setRangeBoundaries(0, 200, BoundaryMode.AUTO);
+            m_plot.addSeries(m_seriesGravity, makeFormatter(lineFillWidth, Color.BLUE, Color.WHITE, 0, height, FILL_MODE));
         }
 
         m_plot.setDomainBoundaries(0, HISTORY_SIZE, BoundaryMode.FIXED);
@@ -705,6 +729,14 @@ public class SensorFragment extends DevFragment
                     float value = sensorEvent.values[0];
                     add(m_seriesBarometer, null, value);
                     m_plotValues.put(BAROMETER_STR, String.valueOf(value));
+                } else if (sensorName.contains(MAGNETOMETER_STR) && m_seriesMagnetometer != null) {
+                    float value = sensorEvent.values[0];
+                    add(m_seriesMagnetometer, null, value);
+                    m_plotValues.put(MAGNETOMETER_STR, String.valueOf(value));
+                } else if (sensorName.contains(GRAVITY_STR) && m_seriesGravity != null) {
+                    float value = sensorEvent.values[0] * 100;
+                    add(m_seriesGravity, null, value);
+                    m_plotValues.put(GRAVITY_STR, String.valueOf(value));
                 }
             }
         }
@@ -715,9 +747,9 @@ public class SensorFragment extends DevFragment
             double maxDb = 0;
             add(m_seriesAudio, null, dbValue);
 
-            int lastIdx = m_seriesAudioMax.size();
+            int lastIdx = m_seriesAudioAvg.size();
             if (lastIdx == 0) {
-                add(m_seriesAudioMax, null, dbValue);
+                add(m_seriesAudioChg, null, dbValue);
                 add(m_seriesAudioAvg, null, dbValue);
             } else {
                 final int avgSpan = 20;
@@ -733,7 +765,13 @@ public class SensorFragment extends DevFragment
                 for (int idx = Math.max(0, lastIdx - maxSpan); idx < lastIdx; idx++) {
                     maxDb = Math.max(maxDb, m_seriesAudio.getY(idx).doubleValue());
                 }
-                add(m_seriesAudioMax, null, maxDb);
+
+                while (m_seriesAudioChg.size() > 0) {
+                    m_seriesAudioChg.removeLast();
+                }
+                m_seriesAudioChg.addLast(0, m_seriesAudio.getY(0));
+                m_seriesAudioChg.addLast(lastIdx-1, m_seriesAudioAvg.getY(lastIdx-1));
+                // add(m_seriesAudioChg, null, maxDb);
 
                 if (m_sensorName.equals(AUDIO_STR)) {
                     // Adjust graph Range to match data.
@@ -744,13 +782,14 @@ public class SensorFragment extends DevFragment
                         maxDb = Math.max(maxDb, m_seriesAudio.getY(idx).doubleValue());
                     }
                     totAvgDb /= lastIdx;
-                    maxDb = (maxDb * 9 + totAvgDb) / 10;
-                    final long AUDIO_STEP = 1000;
+                    maxDb = (maxDb * 6 + totAvgDb * 4) / 10;
+                    final long AUDIO_STEP = 100;
                     if (maxDb > m_maxAudio) {
                         m_maxAudio = (long) ((maxDb + AUDIO_STEP - 1) / AUDIO_STEP) * AUDIO_STEP;
                         m_plot.setRangeBoundaries(0, m_maxAudio, BoundaryMode.FIXED);
                     } else if (maxDb <= m_maxAudio * 0.5) {
-                        m_maxAudio = (long) (maxDb / AUDIO_STEP) * AUDIO_STEP;
+                        long maxAudio = Math.max((long) (maxDb / AUDIO_STEP) * AUDIO_STEP, AUDIO_STEP);
+                        m_maxAudio = maxAudio;
                         m_plot.setRangeBoundaries(0, m_maxAudio, BoundaryMode.FIXED);
                     }
                 }

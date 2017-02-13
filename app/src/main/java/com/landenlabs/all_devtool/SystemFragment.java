@@ -39,6 +39,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.ConfigurationInfo;
+import android.content.pm.FeatureInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.hardware.Sensor;
@@ -805,6 +806,17 @@ public class SystemFragment extends DevFragment {
                 m_log.e(ex.getMessage());
             }
             addBuild("Accounts...", strList);
+        }
+
+        // --------------- Package Features -------------
+        PackageManager pm = getActivity().getPackageManager();
+        FeatureInfo[] features = pm.getSystemAvailableFeatures();
+        if (features != null) {
+            Map<String, String> strList = new LinkedHashMap<String, String>();
+            for (FeatureInfo featureInfo : features) {
+                strList.put(featureInfo.name, "");
+            }
+            addBuild("Features...", strList);
         }
 
         // --------------- Sensor Services -------------

@@ -107,6 +107,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static android.content.pm.ApplicationInfo.FLAG_ALLOW_BACKUP;
+import static com.landenlabs.all_devtool.R.id.appName;
 
 
 /**
@@ -1239,10 +1240,9 @@ public class PackageFragment extends DevFragment
                     }
                 }
             }
-
         }
 
-
+        // getPreferredAppInfo();
 
         /*
         List<ProviderInfo> providerList = getActivity().getPackageManager().queryContentProviders(null, 0, 0);
@@ -1256,6 +1256,63 @@ public class PackageFragment extends DevFragment
         */
     }
 
+    /**
+     * Get info on the preferred (launch by default) applications.
+     * @return
+     */
+    public String getPreferredAppInfo() {
+        List<PackageInfo> packages = getActivity().getPackageManager()
+                .getInstalledPackages(0);
+        List<IntentFilter> filters = new ArrayList<IntentFilter>();
+        List<ComponentName> activities = new ArrayList<ComponentName>();
+        String info = "";
+        int nPref = 0, nFilters = 0, nActivities = 0;
+        PackageInfo packInfo = null;
+        // int orderCnt = 0;
+        for (int i = 0; i < packages.size(); i++) {
+            packInfo = packages.get(i);
+            nPref = getActivity().getPackageManager().getPreferredActivities(filters,
+                    activities, packInfo.packageName);
+            nFilters = filters.size();
+            nActivities = activities.size();
+            if (nPref > 0 || nFilters > 0 || nActivities > 0) {
+                // This is a launch by default package
+                // info += "\n" + packInfo.packageName + "\n";
+                ArrayListPairString pkgList = new ArrayListPairString();
+
+                for (IntentFilter filter : filters) {
+                    info += "IntentFilter:\n";
+                    for (int j = 0; j < filter.countActions(); j++) {
+                        addList(pkgList, "Action", filter.getAction(j));
+                    }
+                    for (int j = 0; j < filter.countCategories(); j++) {
+                        addList(pkgList, "Category", filter.getCategory(j));
+                    }
+                    for (int j = 0; j < filter.countDataTypes(); j++) {
+                        addList(pkgList, "Type", filter.getDataType(j));
+                    }
+                    for (int j = 0; j < filter.countDataAuthorities(); j++) {
+                        addList(pkgList, "Authority", filter.getDataAuthority(j).toString());
+                    }
+                    for (int j = 0; j < filter.countDataPaths(); j++) {
+                        addList(pkgList, "Path", filter.getDataPath(j).toString());
+                    }
+                    for (int j = 0; j < filter.countDataSchemes(); j++) {
+                        addList(pkgList, "Scheme", filter.getDataScheme(j));
+                    }
+                    // for (ComponentName activity : activities) {
+                    // info += "activity="
+                    // + activity.flattenToString() + "\n";
+                    // }
+                }
+                if (pkgList.size() != 0) {
+                    m_workList.add(new PackingItem(packInfo.packageName, pkgList, packInfo, i, packInfo.applicationInfo.processName));
+                }
+            }
+        }
+
+        return info;
+    }
 
     /**
      * Load installed (user or system) packages.
@@ -1962,7 +2019,7 @@ public class PackageFragment extends DevFragment
 
             Ui.<TextView>viewById(summaryView, R.id.packageName).setText(packingItem.fieldStr());
             String ver =  (packingItem.m_packInfo != null ? String.format(" v%.5s", packingItem.m_packInfo.versionName) : "");
-            Ui.<TextView>viewById(summaryView, R.id.appName).setText(packingItem.m_appName + ver);
+            Ui.<TextView>viewById(summaryView, appName).setText(packingItem.m_appName + ver);
 
             if (m_show == SHOW_PREF) {
                 Ui.<TextView>viewById(summaryView, R.id.pkgSize).setText(packingItem.typeStr());

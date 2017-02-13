@@ -43,6 +43,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.system.ErrnoException;
 import android.system.Os;
 import android.system.StructStat;
 import android.view.LayoutInflater;
@@ -807,9 +808,30 @@ public class FileBrowserFragment extends DevFragment
             m_fbDeletelBtn.setText( getString(R.string.filebrowser_delete));
     }
 
+    static boolean isBit(int val, int mask) {
+        return (val & mask) != 0;
+    }
 
     StringBuilder appendPerm(StringBuilder perm, FileUtil.FileInfo fileItem) {
         perm.append("Perm: ");
+
+        if (Build.VERSION.SDK_INT >= 21) {
+            try {
+                StructStat stat = Os.stat(fileItem.getAbsolutePath());
+                int mode = stat.st_mode & 0777;
+                int world = mode & 0007;
+                perm.append(isBit(world, 0004) ? "R" : "-");
+                perm.append(isBit(world, 0002) ? "W" : "-");
+                perm.append(isBit(world, 0001) ? "X" : "-");
+
+                perm.append(fileItem.isFile() ? "F" : "");
+                perm.append(fileItem.isDirectory() ? "D" : "");
+                return perm;
+            } catch (ErrnoException ex) {
+
+            }
+        }
+
         perm.append(fileItem.canRead() ? "R" : "-");
         perm.append(fileItem.canWrite() ? "W" : "-");
         perm.append(fileItem.canExecute() ? "X" : "-");

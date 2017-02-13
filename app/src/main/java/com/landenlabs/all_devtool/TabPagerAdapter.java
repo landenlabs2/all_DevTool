@@ -300,7 +300,7 @@ public class TabPagerAdapter extends FragmentPagerAdapter implements ActionBar.T
         super.restoreState(state, loader);
     }
 
-// ========================================================================
+    // ========================================================================
     // Implement FragmentPagerAdapter
 
     @Override
