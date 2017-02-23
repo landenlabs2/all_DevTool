@@ -41,6 +41,7 @@ import android.view.MenuItem;
 import android.widget.ShareActionProvider;
 import android.widget.Toast;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.landenlabs.all_devtool.shortcuts.ShortcutUtil;
 import com.landenlabs.all_devtool.util.AppCrash;
 import com.landenlabs.all_devtool.util.GoogleAnalyticsHelper;
@@ -82,6 +83,7 @@ public class DevToolActivity extends FragmentActivity {
     private MenuItem m_shareMenuItem;
     protected String m_startFrag;
     private UncaughtExceptionHandler m_uncaughtExceptionHandler;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @SuppressLint("DefaultLocale")
     @Override
@@ -113,6 +115,8 @@ public class DevToolActivity extends FragmentActivity {
 
         JodaTimeAndroid.init(this); // Load TimeZone database.
         GoogleAnalyticsHelper.init(this);
+        // Obtain the FirebaseAnalytics instance.
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         Utils.onActivityCreateSetTheme(this);
 
         setContentView(R.layout.main);

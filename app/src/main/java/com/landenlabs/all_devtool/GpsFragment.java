@@ -168,7 +168,7 @@ public class GpsFragment extends DevFragment implements
         }
     };
 
-    private final void updateGps(Intent paramIntent) {
+    private void updateGps(Intent paramIntent) {
         String str = paramIntent.getAction();
         boolean isEnabled = paramIntent.getBooleanExtra("enabled", false);
         if ((str.equals("android.location.GPS_FIX_CHANGE"))) {

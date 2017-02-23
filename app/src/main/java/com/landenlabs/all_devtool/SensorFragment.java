@@ -687,10 +687,12 @@ public class SensorFragment extends DevFragment
     }
 
     private void add(SimpleXYSeries series, Number x, Number y) {
-        if (series.size() > HISTORY_SIZE)
-            series.removeFirst();
+        if (series != null) {
+            if (series.size() > HISTORY_SIZE)
+                series.removeFirst();
 
-        series.addLast(x, y);
+            series.addLast(x, y);
+        }
     }
 
     private void updatePlot() {

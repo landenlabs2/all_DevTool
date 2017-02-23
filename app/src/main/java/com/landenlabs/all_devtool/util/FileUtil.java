@@ -116,6 +116,15 @@ public class FileUtil {
         public long getDepthSize() {
             return mDepthSize;
         }
+
+        /**
+         * Follow subdirectories and compute total file sizes, up to a maximum of <b>maxFiles</b>
+         * files.
+         *
+         * @param fileCnt  Caller pass in -1. Used internally during recursion.
+         * @param maxFiles
+         * @return  Total file size of files encountered during recursion, stopping at maxFiles.
+         */
         public long findDepthSize(int fileCnt, int maxFiles) {
             if (fileCnt > maxFiles)
                 return mDepthSize;

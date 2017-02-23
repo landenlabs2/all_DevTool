@@ -55,13 +55,13 @@ import java.util.Scanner;
  */
 public class ProcFragment extends DevFragment {
 
-    final ArrayList<ProcInfo> m_list = new ArrayList<ProcInfo>();
-    ExpandableListView m_listView;
-    TextView m_titleTime;
+    private final ArrayList<ProcInfo> m_list = new ArrayList<>();
+    private ExpandableListView m_listView;
+    private TextView m_titleTime;
 
-    private static SimpleDateFormat m_timeFormat = new SimpleDateFormat("HH:mm:ss zz");
+    private static final SimpleDateFormat m_timeFormat = new SimpleDateFormat("HH:mm:ss zz");
 
-    public static String s_name = "Proc";
+    public static final String s_name = "Proc";
 
     public ProcFragment() {
     }
@@ -122,7 +122,7 @@ public class ProcFragment extends DevFragment {
     /**
      * Populate list with 'Build' parameters.
      */
-    void updateList() {
+    private void updateList() {
         // Time today = new Time(Time.getCurrentTimezone());
         // today.setToNow();
         // today.format(" %H:%M:%S")
@@ -131,31 +131,31 @@ public class ProcFragment extends DevFragment {
 
         if (m_list.isEmpty()) {
             if (true) {
-                addBuild("BOARD", Build.BOARD);
-                addBuild("BOOTLOADER", Build.BOOTLOADER);
-                addBuild("BRAND", Build.BRAND);
-                addBuild("CPU_ABI", Build.CPU_ABI);
-                addBuild("CPU_ABI2", Build.CPU_ABI2);
-                addBuild("OS.ARCH", System.getProperty("os.arch"));
+                addString("BOARD", Build.BOARD);
+                addString("BOOTLOADER", Build.BOOTLOADER);
+                addString("BRAND", Build.BRAND);
+                addString("CPU_ABI", Build.CPU_ABI);
+                addString("CPU_ABI2", Build.CPU_ABI2);
+                addString("OS.ARCH", System.getProperty("os.arch"));
                 if (Build.VERSION.SDK_INT >= 21) {
-                    // addBuild("SUPPORTED_ABIS", Arrays.toString(Build.SUPPORTED_ABIS));
+                    // addString("SUPPORTED_ABIS", Arrays.toString(Build.SUPPORTED_ABIS));
                     if (Build.SUPPORTED_32_BIT_ABIS != null && Build.SUPPORTED_32_BIT_ABIS.length > 0) {
-                        addBuild("32_BIT_ABIS", Arrays.toString(Build.SUPPORTED_32_BIT_ABIS));
+                        addString("32_BIT_ABIS", Arrays.toString(Build.SUPPORTED_32_BIT_ABIS));
                     } else {
-                        addBuild("64_BIT_ABIS", Arrays.toString(Build.SUPPORTED_64_BIT_ABIS));
+                        addString("64_BIT_ABIS", Arrays.toString(Build.SUPPORTED_64_BIT_ABIS));
                     }
                 }
 
-                addBuild("DEVICE", Build.DEVICE);
-                addBuild("MANUFACTURER", Build.MANUFACTURER);
-                addBuild("MODEL", Build.MODEL);
-                addBuild("PRODUCT", Build.PRODUCT);
+                addString("DEVICE", Build.DEVICE);
+                addString("MANUFACTURER", Build.MANUFACTURER);
+                addString("MODEL", Build.MODEL);
+                addString("PRODUCT", Build.PRODUCT);
             }
 
             ArrayList<String> cpuInfoList = getCpuInfoList();
             for (String line : cpuInfoList) {
                 String[] vals = line.split(": ");
-                addBuild(vals[0], vals[1]);
+                addString(vals[0], vals[1]);
             }
         }
         final BuildArrayAdapter adapter = new BuildArrayAdapter(this.getActivity());
@@ -169,19 +169,19 @@ public class ProcFragment extends DevFragment {
     }
 
 
-    void addBuild(String name, String value) {
+    private void addString(String name, String value) {
         if (!TextUtils.isEmpty(value))
             m_list.add(new ProcInfo(name, value.trim()));
     }
 
-    void addBuild(String name, Map<String, String> value) {
+    void addMap(String name, Map<String, String> value) {
         if (!value.isEmpty())
             m_list.add(new ProcInfo(name, value));
     }
 
 
-    public static ArrayList<String> getCpuInfoList() {
-        ArrayList<String> list = new ArrayList<String>();
+    private static ArrayList<String> getCpuInfoList() {
+        ArrayList<String> list = new ArrayList<>();
         try {
             Scanner scan = new Scanner(new File("/proc/cpuinfo"));
             while (scan.hasNextLine()) {
@@ -204,11 +204,6 @@ public class ProcFragment extends DevFragment {
         final String m_fieldStr;
         final String m_valueStr;
         final Map<String, String> m_valueList;
-
-        ProcInfo() {
-            m_fieldStr = m_valueStr = null;
-            m_valueList = null;
-        }
 
         ProcInfo(String str1, String str2) {
             m_fieldStr = str1;
@@ -247,7 +242,7 @@ public class ProcFragment extends DevFragment {
     // =============================================================================================
 
     final static int EXPANDED_LAYOUT = R.layout.build_list_row;
-    final static int SUMMARY_LAYOUT = R.layout.build_list_row;
+    private final static int SUMMARY_LAYOUT = R.layout.build_list_row;
 
     /**
      * ExpandableLis UI 'data model' class

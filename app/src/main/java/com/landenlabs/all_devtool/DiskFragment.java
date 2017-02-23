@@ -42,6 +42,7 @@ import android.widget.CheckBox;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 
+import com.landenlabs.all_devtool.util.OsUtils;
 import com.landenlabs.all_devtool.util.Ui;
 import com.landenlabs.all_devtool.util.Utils;
 
@@ -57,6 +58,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+
+import static com.landenlabs.all_devtool.FileBrowserFragment.isBit;
 
 /**
  * Display "Build" system information.
@@ -241,7 +244,7 @@ public class DiskFragment extends DevFragment {
         m_titleTime.setText(m_timeFormat.format(dt));
 
         m_list.clear();
-        addBuild("Permission", hasWritePermission() ? "Granted Write" : "Denied Write");
+        addString("Permission", hasWritePermission() ? "Granted Write" : "Denied Write");
 
         if (true) {
             m_javaDirList = new LinkedHashMap<>();
@@ -270,12 +273,14 @@ public class DiskFragment extends DevFragment {
 
                         FileOutputStream fos = getContext().openFileOutput(FILENAME, Context.MODE_PRIVATE);
                         fos.write(string.getBytes());
-                        addBuild("openFileOutput", fos.toString());
+                        addString("openFileOutput", fos.toString());
                         fos.close();
                     } catch (Exception ex) {
                     }
                 }
 
+                addString("External State", Environment.getExternalStorageState());
+                
                 try {
                     addFile("getExternalCacheDir", getActivity().getExternalCacheDir());
                 } catch (Exception ex) {
@@ -293,47 +298,54 @@ public class DiskFragment extends DevFragment {
 
 
             } catch (Exception ex) {
-                addBuild("Exception", ex.getMessage());
+                addString("Exception", ex.getMessage());
             }
 
-            addBuild("java dir\n[rwx]=owner [RWX]=world", m_javaDirList);
+            addString("java dir\n[rwx]=owner [RWX]=world", m_javaDirList);
         }
 
         if (true) {
             if (false) {
                 m_lsList = getShellCmd(new String[]{"ls", "-l"});
-                addBuild("ls -l", m_lsList);
+                addString("ls -l", m_lsList);
             }
             if (false) {
                 m_duList = getFileList(new String[] {"du", "-ks", "/"}, "[^ ]+ ([^:]+).*", "$1", ".*/(proc|acct|dev)/.*");
-                addBuild("du -ks /", m_duList);
+                addString("du -ks /", m_duList);
             }
 
 
             if (m_fileSystemCb.isChecked()) {
                 m_dfList = getShellCmd(new String[] { "df" });
-                addBuild("df", m_dfList);
+                addString("df", m_dfList);
 
                 m_mntList = getShellCmd(new String[] {"mount"});
-                addBuild("mount", m_mntList);
+                addString("mount", m_mntList);
             }
 
             if (m_diskUsageCb.isChecked()) {
                 m_duStorageList = getShellCmd(new String[]{"du", "-chHLd", "2", "/storage"});
-                addBuild("du -chHLd 2 /storage", m_duStorageList);
+                addString("du -chHLd 2 /storage", m_duStorageList);
 
                 m_duMntList = getShellCmd(new String[]{"du", "-chHLd", "1", "/mnt/"});
-                addBuild("du -chHLs /mnt", m_duMntList);
+                addString("du -chHLs /mnt", m_duMntList);
 
                 m_duSdcardList = getShellCmd(new String[] { "du", "-chHL", "/sdcard/" });
-                addBuild("du -chHL /sdcard", m_duSdcardList);
+                addString("du -chHL /sdcard", m_duSdcardList);
             }
 
             if (m_diskStatsCb.isChecked()) {
                 m_diskStats = getShellCmd(new String[]{"dumpsys", "diskstats"});
                 readFile("/proc/diskstats");
-                addBuild("Disk Stats", m_diskStats);
+                addString("Disk Stats", m_diskStats);
             }
+
+            /*
+            TODO
+
+            readFile("/proc/partitions");  // grep for ext4
+            readFile("/proc/mounts");      // assocuated partions with mounts to get disk layout
+            */
         }
 
 
@@ -350,6 +362,23 @@ public class DiskFragment extends DevFragment {
 
     void addFile(String name, File file) {
         if (file != null) {
+            int mode = OsUtils.getPermissions(file);
+            if (mode != -1) {
+                int world = mode & 0007;
+                int owner = mode & 0700;
+
+                char r = isBit(owner, 0400) ? 'r' : '-';
+                char w = isBit(world, 0200) ? 'w' : '-';
+                char x = isBit(world, 0100) ? 'x' : '-';
+                r = isBit(world, 0004) ? 'R' : r;
+                w = isBit(world, 0002) ? 'W' : w;
+                x = isBit(world, 0001) ? 'X' : x;
+
+                String rwStr = String.format("[%c%c%c] ", r,w, x);
+                m_javaDirList.put(name, rwStr + file.getAbsolutePath());
+                return;
+            }
+
             char r = file.canRead() ? 'r' : '-';
             char w = file.canWrite() ? 'w' : '-';
             char x = file.canExecute() ? 'x' : '-';
@@ -363,12 +392,12 @@ public class DiskFragment extends DevFragment {
     }
 
 
-    void addBuild(String name, String value) {
+    void addString(String name, String value) {
         if (!TextUtils.isEmpty(value))
             m_list.add(new GroupInfo(name, value.trim()));
     }
 
-    void addBuild(String name, Map<String, String> value) {
+    void addString(String name, Map<String, String> value) {
         if (!value.isEmpty())
             m_list.add(new GroupInfo(name, value));
     }

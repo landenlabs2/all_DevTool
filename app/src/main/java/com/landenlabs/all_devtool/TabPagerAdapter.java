@@ -92,6 +92,7 @@ public class TabPagerAdapter extends FragmentPagerAdapter implements ActionBar.T
                 }
             },
 
+
             // Disk
             new Creator() {
                 public DevFragment creator() {
@@ -102,7 +103,6 @@ public class TabPagerAdapter extends FragmentPagerAdapter implements ActionBar.T
                     return DiskFragment.s_name;
                 }
             },
-
 
             // System
             new Creator() {

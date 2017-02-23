@@ -27,7 +27,6 @@ import android.widget.ListView;
 import android.widget.ShareActionProvider;
 import android.widget.TableLayout;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.landenlabs.all_devtool.DevToolActivity;
 import com.landenlabs.all_devtool.GlobalInfo;
 import com.landenlabs.all_devtool.R;
@@ -43,6 +42,11 @@ import java.util.List;
 // import com.google.android.gms.maps.model.LatLng;
 
 public class Utils {
+    static class LatLng {
+        double latitude;
+        double longitude;
+    }
+
     // Logger - set to LLog.DBG to only log in Debug build, use LLog.On for always log.
     private static final LLog s_log = LLog.DBG;
 
