@@ -179,6 +179,12 @@ public class DevToolActivity extends FragmentActivity {
             case R.id.menu_shortcuts_off:
                 ShortcutUtil.removeShortcuts();
                 return true;
+
+            case R.id.menu_lock_orientation:
+                item.setChecked(!item.isChecked());
+                GlobalInfo.s_globalInfo.isLockedOrientation = item.isChecked();
+                GlobalInfo.s_globalInfo.lockedOrientation = getResources().getConfiguration().orientation;;
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -188,6 +194,10 @@ public class DevToolActivity extends FragmentActivity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+
+        if (GlobalInfo.s_globalInfo.isLockedOrientation) {
+            setRequestedOrientation(GlobalInfo.s_globalInfo.lockedOrientation);
+        }
 
         // Checks the orientation of the screen
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {

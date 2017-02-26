@@ -337,7 +337,10 @@ public class ClockFragment extends DevFragment implements View.OnClickListener  
      */
     private void updateClock() {
         m_date.setTime(System.currentTimeMillis());
+        m_timeZone = TimeZone.getDefault();
+        s_timeZoneFormat.setTimeZone(m_timeZone);
         String localTmStr = s_timeZoneFormat.format(m_date);
+
         m_clockLocalTv.setText(localTmStr);
         String gmtTmStr = s_timeGmtFormat.format(m_date);
         m_clockGmtTv.setText(gmtTmStr);

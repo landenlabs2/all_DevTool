@@ -8,19 +8,28 @@ android {
     signingConfigs {
         release
     }
-    compileSdkVersion 24
-    buildToolsVersion '24.0.3'
+    compileSdkVersion 25
+    buildToolsVersion '25.0.2'
     defaultConfig {
         applicationId 'com.landenlabs.all_devtool'
         minSdkVersion 17
-        targetSdkVersion 24
-        versionCode 1918
-        versionName '1.9.18'
+        targetSdkVersion 25
+
+        versionCode 1919
+        versionName '1.9.19'
+
         // signingConfig signingConfigs.release
         // targetSdkVersion.apiString
         resValue "string", "targetSdkVersion", targetSdkVersion.apiString
         resValue "string", "compileSdkVersion", compileSdkVersion
         resValue "string", "buildToolsVersion", buildToolsVersion
+
+
+        // Disable creation of png for vector drawables.
+        vectorDrawables.useSupportLibrary = true
+
+        // Limit languages to following list.
+        resConfigs "en", "es", "fr"
     }
     buildTypes {
         release {
@@ -67,7 +76,7 @@ android {
 }
 
 ext {
-    supportLibVersion = '24.2.0'
+    supportLibVersion = '25.2.0'
     leakCanaryVersion = '1.4-beta2'
     playServicesVersion = '9.6.1'   // '10.0.1'
 }
@@ -113,6 +122,8 @@ def appendVersionNameVersionCode(variant, defaultConfig) {
 
         def file = output.packageApplication.outputFile
         def fileName = file.name.replace(".apk", "-v" + defaultConfig.versionCode + ".apk")
+        def ourname = project.parent.name;
+        fileName = fileName.replace("app-", "$ourname-");
         output.packageApplication.outputFile = new File(file.parent, fileName)
     }
 }

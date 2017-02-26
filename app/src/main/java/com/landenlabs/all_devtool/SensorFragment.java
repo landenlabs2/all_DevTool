@@ -116,7 +116,7 @@ public class SensorFragment extends DevFragment
     private static final String BATTERY_STR = "Battery";
     private static final String ORIENTATION_STR = "Orientation";
     private static final String LIGHT_STR = "Light";
-    private static final String AUDIO_STR = "Audio Db";
+    private static final String AUDIO_STR = "Audio Lvl";
     private static final String PROCESSES_STR = "#Processes";
     private static final String MEMORY_STR = "Free Memory";
 
@@ -771,7 +771,8 @@ public class SensorFragment extends DevFragment
                 while (m_seriesAudioChg.size() > 0) {
                     m_seriesAudioChg.removeLast();
                 }
-                m_seriesAudioChg.addLast(0, m_seriesAudio.getY(0));
+
+                m_seriesAudioChg.addLast(0, m_seriesAudioAvg.getY(0));
                 m_seriesAudioChg.addLast(lastIdx-1, m_seriesAudioAvg.getY(lastIdx-1));
                 // add(m_seriesAudioChg, null, maxDb);
 

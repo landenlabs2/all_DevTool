@@ -46,11 +46,8 @@ import com.landenlabs.all_devtool.util.OsUtils;
 import com.landenlabs.all_devtool.util.Ui;
 import com.landenlabs.all_devtool.util.Utils;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -60,6 +57,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 import static com.landenlabs.all_devtool.FileBrowserFragment.isBit;
+import static com.landenlabs.all_devtool.util.SysUtils.runShellCmd;
 
 /**
  * Display "Build" system information.
@@ -77,7 +75,6 @@ public class DiskFragment extends DevFragment {
     CheckBox m_diskStatsCb;
 
     Map<String, String> m_javaDirList;
-    Map<String, String> m_diskStats;
     Map<String, String> m_duList;
     Map<String, String> m_lsList;
     Map<String, String> m_duMntList;
@@ -85,6 +82,9 @@ public class DiskFragment extends DevFragment {
     Map<String, String> m_duStorageList;
     Map<String, String> m_duSdcardList;
     Map<String, String> m_dfList;
+
+    Map<String, String> m_diskDumpStats;
+    ArrayList<String> m_diskProcStats;
     
     private static SimpleDateFormat m_timeFormat = new SimpleDateFormat("HH:mm:ss zz");
 
@@ -335,9 +335,16 @@ public class DiskFragment extends DevFragment {
             }
 
             if (m_diskStatsCb.isChecked()) {
-                m_diskStats = getShellCmd(new String[]{"dumpsys", "diskstats"});
-                readFile("/proc/diskstats");
-                addString("Disk Stats", m_diskStats);
+                // m_diskDumpStats = getShellCmd(new String[]{"dumpsys", "diskstats"});
+                // addString("dumpsys diskstats", m_diskDumpStats);
+                m_diskProcStats = readFile("/proc/diskstats", " ", 1);
+                Map<String, String> diskProcStatsMap = new LinkedHashMap<>();
+                int rowCnt = 0;
+                for (String rowStr : m_diskProcStats) {
+                    diskProcStatsMap.put(String.format("%3d", rowCnt), rowStr);
+                    rowCnt++;
+                }
+                addString("/proc/diskstats/", diskProcStatsMap);
             }
 
             /*
@@ -435,43 +442,24 @@ public class DiskFragment extends DevFragment {
         return mapList;
     }
 
-    private static  ArrayList<String>  runShellCmd(String[] shellCmd) {
-       ArrayList<String> list = new ArrayList<String>();
-       try {
-           Process process = new ProcessBuilder()
-                   .command(shellCmd)
-                   .redirectErrorStream(true)
-                   .start();
 
-           // Process process = Runtime.getRuntime().exec(shellCmd);
-           BufferedReader bufferedReader = new BufferedReader(
-                   new InputStreamReader(process.getInputStream()));
-
-           String line = "";
-           while ((line = bufferedReader.readLine()) != null) {
-               list.add(line);
-           }
-       }
-       catch (IOException ex) {
-           list.add(ex.getLocalizedMessage());
-       }
-
-       return list;
-    }
 
     /**
      *
      * @param diskFileName example /proc/cpuinfo
+     * @param splitPat Ex  " " or ": "
+     * @param splitMinCnt   Ex 1
+     *
      * @return
      */
-    private static ArrayList<String> readFile(String diskFileName) {
+    private static ArrayList<String> readFile(String diskFileName, String splitPat, int splitMinCnt) {
         ArrayList<String> list = new ArrayList<String>();
         try {
             Scanner scan = new Scanner(new File(diskFileName));
             while (scan.hasNextLine()) {
                 String line = scan.nextLine();
-                String[] vals = line.split(": ");
-                if (vals.length > 1) {
+                String[] vals = line.split(splitPat);
+                if (vals.length > splitMinCnt) {
                     list.add(line);
                     // map.put(vals[0].trim(), vals[1].trim());
                 }

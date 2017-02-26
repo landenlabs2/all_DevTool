@@ -1175,7 +1175,6 @@ public class PackageFragment extends DevFragment
             PackageManager pm = getActivity().getPackageManager();
 
 
-
             // PackageManager.GET_RESOLVED_FILTER);  // or PackageManager.MATCH_DEFAULT_ONLY
             List<ResolveInfo> resolveList = pm
                     .queryIntentActivities(resolveIntent, -1); // PackageManager.MATCH_DEFAULT_ONLY | PackageManager.GET_INTENT_FILTERS);

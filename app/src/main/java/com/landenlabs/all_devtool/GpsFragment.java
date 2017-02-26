@@ -113,7 +113,7 @@ public class GpsFragment extends DevFragment implements
     // Additional times
     private static final Locale s_locale = Locale.getDefault();
     private static final SimpleDateFormat s_hour12Format = new SimpleDateFormat("hh:mm:ss a", s_locale);
-    private static final SimpleDateFormat s_hour24Format = new SimpleDateFormat("HH:mm:ss", s_locale);
+    private static final SimpleDateFormat s_hour24Format = new SimpleDateFormat("HH:mm:ss.S", s_locale);
     private static final SimpleDateFormat s_time12Format = new SimpleDateFormat("MMM-dd hh:mm a", s_locale);
     private static final SimpleDateFormat s_time24Format = new SimpleDateFormat("MMM-dd HH:mm", s_locale);
 
@@ -724,6 +724,14 @@ public class GpsFragment extends DevFragment implements
 
     private int addMsgToDetailRow(int textColor, String msg) {
 
+        if (textColor == s_colorMsg) {
+            GpsItem gpsItem = m_lastUpdates.get(STATUS_CB);
+            if (gpsItem != null) {
+                gpsItem.set(System.currentTimeMillis(), msg);
+                listChanged();
+            }
+        }
+
         if (m_detailList.size() > s_maxToKeep) {
             m_detailList.remove(0);
         }
@@ -739,15 +747,29 @@ public class GpsFragment extends DevFragment implements
      * @return
      */
     private int updateDetailRow(GpsItem item) {
-        m_detailList.add(item);
+        boolean isDup = false;
+        int detailCnt = m_detailList.size();
+        if (detailCnt > 0) {
+            GpsItem prevItem = m_detailList.get(detailCnt-1);
+            if (prevItem.m_msg.equals(item.m_msg)
+                    && (item.m_time - prevItem.m_time) < 1000) {
+                isDup = true;
+            }
+        }
+
+        if (!isDup) {
+            m_detailList.add(item);
+        }
         
         GpsInfo gpsInfo = m_list.get(s_detailRow);
         ItemList itemList = gpsInfo.getList();
         CheckBox cb = m_colorsCb.get(item.m_color);
-        if (m_gpsMonitor && (cb == null || cb.isChecked())) {
-            itemList.add(item);
-            listChanged();
-        }
+        // if (m_gpsMonitor && (cb == null || cb.isChecked())) {
+            if (!isDup) {
+                itemList.add(item);
+                listChanged();
+            }
+        // }
         
         return itemList.size();
     }

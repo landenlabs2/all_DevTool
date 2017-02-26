@@ -48,8 +48,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import static com.landenlabs.all_devtool.util.SysUtils.runShellCmd;
+
 /**
- * Display "Build" system information.
+ * Display "Process"  information.
  *
  * @author Dennis Lang
  */
@@ -152,12 +154,36 @@ public class ProcFragment extends DevFragment {
                 addString("PRODUCT", Build.PRODUCT);
             }
 
-            ArrayList<String> cpuInfoList = getCpuInfoList();
-            for (String line : cpuInfoList) {
-                String[] vals = line.split(": ");
-                addString(vals[0], vals[1]);
+            if (true) {
+                ArrayList<String> cpuInfoList = readFile("/proc/cpuinfo", ": ", 2);
+                for (String line : cpuInfoList) {
+                    String[] vals = line.split(": ");
+                    addString(vals[0], vals[1]);
+                }
+            }
+
+            if (true) {
+                ArrayList<String> procInfo = readFile("/proc/100/stat", " ", 2);
+                for (String line : procInfo) {
+                    String[] vals = line.split(" ");
+                    int rowCnt = 0;
+                    for (String val : vals) {
+                        addString(String.format("100/stat %2d", rowCnt++), val);
+                    }
+                }
+            }
+
+            if (true) {
+                ArrayList<String> memList = getPkgMemInfo("com.wsiscroll.android.weather");
+                if (memList != null && memList.size() > 0) {
+                    int rowCnt = 0;
+                    for (String line : memList) {
+                        addString(String.format("pkgMem %3d", rowCnt++), line);
+                    }
+                }
             }
         }
+
         final BuildArrayAdapter adapter = new BuildArrayAdapter(this.getActivity());
         m_listView.setAdapter(adapter);
 
@@ -180,20 +206,27 @@ public class ProcFragment extends DevFragment {
     }
 
 
-    private static ArrayList<String> getCpuInfoList() {
+    private static ArrayList<String> readFile(String filename, String splitPat, int  minSplitCnt) {
         ArrayList<String> list = new ArrayList<>();
         try {
-            Scanner scan = new Scanner(new File("/proc/cpuinfo"));
+            Scanner scan = new Scanner(new File(filename));
             while (scan.hasNextLine()) {
                 String line = scan.nextLine();
-                String[] vals = line.split(": ");
-                if (vals.length > 1) {
+                String[] vals = line.split(splitPat);
+                if (vals.length >= minSplitCnt) {
                     list.add(line);
                     // map.put(vals[0].trim(), vals[1].trim());
                 }
             }
         } catch (Exception e) {
-            Log.e("getCpuInfoMap",Log.getStackTraceString(e));}
+            Log.e("getCpuInfoMap",Log.getStackTraceString(e));
+        }
+        return list;
+    }
+
+    private static ArrayList<String> getPkgMemInfo(String packageName) {
+        ArrayList<String> list = runShellCmd(
+                new String[] {"dumpsys", "meminfo", packageName});
         return list;
     }
 

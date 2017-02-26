@@ -48,6 +48,8 @@ public class GlobalInfo {
     public String pkgName;
     public String version;
     public boolean isDebug = false;
+    public boolean isLockedOrientation = false;
+    public int lockedOrientation = 0;
 
     public DevToolActivity mainFragActivity;
     public TabPagerAdapter tabAdapter;

@@ -73,6 +73,11 @@ public abstract class DevFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        if (GlobalInfo.s_globalInfo.isLockedOrientation) {
+            getActivity().setRequestedOrientation(GlobalInfo.s_globalInfo.lockedOrientation);
+        }
+
         cacheFragment();
 
         // this.setRetainInstance(true);
