@@ -135,11 +135,11 @@
         <item>Sdcard</item>
         <item>Download</item>
         <item>Data</item>
-        <item>Dcim</item>
-        <item>Documents</item>
+        <item>DCIM</item>
+        <item>documents</item>
         <item>Movies</item>
         <item>Music</item>
-        <item>Picture</item>
+        <item>Pictures</item>
         <item>Podcast</item>
         <item>Ringtones</item>
     </string-array>

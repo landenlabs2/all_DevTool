@@ -43,6 +43,9 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -51,6 +54,7 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -65,6 +69,7 @@ import com.landenlabs.all_devtool.dialogs.DeleteDialog;
 import com.landenlabs.all_devtool.util.FileUtil;
 import com.landenlabs.all_devtool.util.LLog;
 import com.landenlabs.all_devtool.util.OsUtils;
+import com.landenlabs.all_devtool.util.SysUtils;
 import com.landenlabs.all_devtool.util.Ui;
 import com.landenlabs.all_devtool.util.Utils;
 
@@ -376,11 +381,30 @@ public class FileBrowserFragment extends DevFragment
 
         m_loadSpinner = Ui.viewById(m_rootView, R.id.fb_load_spinner);
         m_loadSpinner.addOnLayoutChangeListener(this);
+
+        final String[] nameList = getResources().getStringArray(R.array.fb_load_array);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                getDirDetails(nameList);
+            }
+        }).start();
+
+        ArrayAdapter<String> spinnerAdapter = new DirPathSpinnerAdapter(getContext(),
+                android.R.layout.simple_spinner_item,
+                nameList, mDirItems);
+
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        m_loadSpinner.setAdapter(spinnerAdapter);
+
+
         m_sortSpinner = Ui.viewById(m_rootView, R.id.fb_sort_spinner);
         if (m_menu != null) {
             MenuItem sortBy = m_menu.findItem(m_sortBy);
             if (sortBy != null) {
-                int pos = Arrays.asList(getResources().getStringArray(R.array.fb_sort_array)).indexOf(sortBy.getTitle());
+                int pos = Arrays.asList(getResources().getStringArray(R.array.fb_sort_array))
+                        .indexOf(sortBy.getTitle());
                 if (pos != -1)
                     m_sortSpinner.setSelection(pos);
             }
@@ -394,6 +418,115 @@ public class FileBrowserFragment extends DevFragment
         updateList();
         return m_rootView;
     }
+
+    List<SpannableString> mDirItems = new ArrayList<>();
+
+    void getDirDetails(String[] dirList) {
+        for (String dirName : dirList) {
+            File dir = null;
+            if (dirName.compareToIgnoreCase("root") == 0) {
+                dir = File.listRoots()[0];
+                // dir = new File("/");
+            } else if (dirName.compareToIgnoreCase("data") == 0) {
+                dir = Environment.getDataDirectory();
+                if (OsUtils.getPermissions(m_dir) == -1) {
+                    m_dir = Environment.getExternalStoragePublicDirectory("data");
+                }
+            } else if (dirName.compareToIgnoreCase("Sdcard") == 0) {
+                dir = Environment.getExternalStorageDirectory();
+            } else if (dirName.compareToIgnoreCase("documents") == 0) {
+                if (Build.VERSION.SDK_INT >= 19)
+                    dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+                else
+                    dir = Environment.getExternalStorageDirectory();
+            } else {
+                dir = Environment.getExternalStoragePublicDirectory(dirName);
+            }
+
+            String path = (dir == null) ? "" : dir.getAbsolutePath();
+            int perm = OsUtils.getPermissions(dir);
+            String permStr = SysUtils.getPermissionString(perm);
+            dirName = dirName + "  ";
+
+            int nameColor = 0xffffffff;
+            int resColor  = 0xff40ff80;
+            int pathColor = 0xffd0d0d0;
+
+            if (dir.listFiles() == null) {
+                // No files - colorize yellow
+                nameColor = resColor = pathColor = 0xffffffb0;
+            }
+            if (perm == -1) {
+                // No permission - colorize pink
+                nameColor = resColor = pathColor = 0xffffb0b0;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(dirName);
+            sb.append(permStr).append("\n");
+            sb.append(path);
+
+            SpannableString span = new SpannableString(sb.toString());
+            int nameLen = dirName.length();
+            int permLen = permStr.length();
+            span.setSpan(new ForegroundColorSpan(nameColor), 0, nameLen, 0);
+            span.setSpan(new ForegroundColorSpan(resColor), nameLen+1, nameLen+permLen, 0);
+            span.setSpan(new ForegroundColorSpan(pathColor), nameLen+permLen+1, span.length(), 0);
+            mDirItems.add(span);
+        }
+    }
+
+    // =============================================================================================
+    class DirPathSpinnerAdapter extends ArrayAdapter<String> {
+        List<SpannableString> mSpanList;
+        String[] mNameList;
+
+        public DirPathSpinnerAdapter(Context context, int txViewResId,
+                String[] nameList, List<SpannableString> spanList) {
+            super(context, txViewResId);
+            mNameList = nameList;
+            mSpanList = spanList;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return (mNameList == null || mNameList.length == 0);
+        }
+
+        @Override
+        public int getCount() {
+            return mNameList.length;
+        }
+
+        /*
+            <item>Sdcard</item>
+            <item>Download</item>
+            <item>Data</item>
+            <item>Dcim</item>
+            <item>Documents</item>
+        */
+        @Override
+        public @Nullable
+        String getItem(int position) {
+            return mNameList[position];
+        }
+
+        @Override
+        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            View view =  super.getView(position, convertView, parent);
+            return view;
+        }
+
+        @Override
+        public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            TextView view =  (TextView)super.getDropDownView(position, convertView, parent);
+            view.setMaxLines(3);
+            view.setSingleLine(false);
+            view.setText(mSpanList.get(position));
+            return view;
+        }
+    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -653,6 +786,9 @@ public class FileBrowserFragment extends DevFragment
                 break;
             case R.id.filebrowser_data:
                 m_dir = Environment.getDataDirectory();
+                if (OsUtils.getPermissions(m_dir) == -1) {
+                    m_dir = Environment.getExternalStoragePublicDirectory("data");
+                }
                 break;
             case R.id.filebrowser_dcim:
                 m_dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);

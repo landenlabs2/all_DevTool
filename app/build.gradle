@@ -15,15 +15,15 @@ android {
         minSdkVersion 17
         targetSdkVersion 25
 
-        versionCode 1919
-        versionName '1.9.19'
+        versionCode 1920
+        versionName '1.9.20'
 
         // signingConfig signingConfigs.release
-        // targetSdkVersion.apiString
         resValue "string", "targetSdkVersion", targetSdkVersion.apiString
         resValue "string", "compileSdkVersion", compileSdkVersion
         resValue "string", "buildToolsVersion", buildToolsVersion
-
+        resValue "string", "javaVersion", org.gradle.internal.jvm.Jvm.current().javaVersion.toString()
+        resValue "string", "gradleVersion", GradleVersion.current().getVersion()
 
         // Disable creation of png for vector drawables.
         vectorDrawables.useSupportLibrary = true
@@ -98,6 +98,7 @@ dependencies {
     // Firebase
     compile "com.google.firebase:firebase-core:${playServicesVersion}"
 
+    // HockeyApp crash reporting
     compile 'net.hockeyapp.android:HockeySDK:4.1.1'
 
     // 3rdparty libraries

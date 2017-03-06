@@ -369,29 +369,27 @@ public class DiskFragment extends DevFragment {
 
     void addFile(String name, File file) {
         if (file != null) {
-            int mode = OsUtils.getPermissions(file);
-            if (mode != -1) {
-                int world = mode & 0007;
-                int owner = mode & 0700;
-
-                char r = isBit(owner, 0400) ? 'r' : '-';
-                char w = isBit(world, 0200) ? 'w' : '-';
-                char x = isBit(world, 0100) ? 'x' : '-';
-                r = isBit(world, 0004) ? 'R' : r;
-                w = isBit(world, 0002) ? 'W' : w;
-                x = isBit(world, 0001) ? 'X' : x;
-
-                String rwStr = String.format("[%c%c%c] ", r,w, x);
-                m_javaDirList.put(name, rwStr + file.getAbsolutePath());
-                return;
-            }
-
             char r = file.canRead() ? 'r' : '-';
             char w = file.canWrite() ? 'w' : '-';
             char x = file.canExecute() ? 'x' : '-';
             r = file.setReadable(true, false) ? 'R' : r;
             w = file.setWritable(true, false) ? 'W' : w;
             x = file.setExecutable(true, false) ? 'X' : x;
+
+            int mode = OsUtils.getPermissions(file);
+            if (mode != -1) {
+                int owner = mode & 0700;
+                int group = mode & 0070;
+                int world = mode & 0007;
+
+                r = isBit(owner, 0400) ? 'r' : '-';
+                w = isBit(owner, 0200) ? 'w' : '-';
+                x = isBit(owner, 0100) ? 'x' : '-';
+
+                r = isBit(world, 0004) ? 'R' : r;
+                w = isBit(world, 0002) ? 'W' : w;
+                x = isBit(world, 0001) ? 'X' : x;
+            }
 
             String rwStr = String.format("[%c%c%c] ", r,w, x);
             m_javaDirList.put(name, rwStr + file.getAbsolutePath());

@@ -375,4 +375,31 @@ public class SysUtils {
         return list;
     }
 
+    static boolean isBit(int val, int mask) {
+        return (val & mask) != 0;
+    }
+
+    public static String getPermissionString(int mode) {
+        char r = '-';
+        char w = '-';
+        char x = '-';
+
+        if (mode != -1) {
+            int owner = mode & 0700;
+            int group = mode & 0070;
+            int world = mode & 0007;
+
+            r = isBit(owner, 0400) ? 'r' : '-';
+            w = isBit(owner, 0200) ? 'w' : '-';
+            x = isBit(owner, 0100) ? 'x' : '-';
+
+            r = isBit(world, 0004) ? 'R' : r;
+            w = isBit(world, 0002) ? 'W' : w;
+            x = isBit(world, 0001) ? 'X' : x;
+        }
+
+        String rwStr = String.format("[%c%c%c] ", r,w, x);
+        return rwStr;
+    }
+
 }
