@@ -1,7 +1,7 @@
 ### a LanDen Labs - DevTool
 Android Developer Tool
 
-+Latest GitHub project moved to:
++Moved Latest GitHub project to:
 +[https://github.com/landenlabs/all_DevTool)
 
 ***apk v1.9.13  available in app directory.***
